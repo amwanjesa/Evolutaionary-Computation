@@ -3,7 +3,7 @@ import random
 
 class GA:
     def __init__(self, population_size):
-        self.population = self.generate_population(length=)
+        self.population = self.generate_population(length=100, size=population_size)
 
     def crossover(self):
         pass
