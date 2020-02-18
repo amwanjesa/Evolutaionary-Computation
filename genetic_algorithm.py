@@ -1,5 +1,5 @@
 import random, heapq
-
+from fitness import Fitness
 seed(23)
 
 class GA:
@@ -51,14 +51,12 @@ class GA:
             return child
 
     def family_competition(self, k=2):
-        family = [self.parent, self.children]          
-        # call fitness function for the family
-        #family_fitness = fitness(family)
-        total_fitness = [parent_fitness, children_fitness]
-        best_solution = heapq.nlargest(2, total_fitness)
-        best_solution_index = [total_fitness.index(best_solution[0]), total_fitness.index(best_solution[1])]
+        family = self.parent + self.children
+
+        family_fitness = {solution:Fitness.count_ones(solution) for solution in family}          
+        sorted_family = sorted(family_fitness.items(), key = lambda x: x[1])
         
-        return [family[best_solution_index[0], family[best_solution_index[1]]]
+        return [sorted_family[len(sorted_family)-1][0], sorted_family[len(sorted_family)-2][0]]
 
     def generate_population(self, length=100, size=10):
         def get_binary_string(length):
