@@ -1,18 +1,18 @@
 import random, heapq
 from fitness import Fitness
-seed(23)
+random.seed(23)
 
 class GA:
     def __init__(self, population_size):
         self.population = self.generate_population(length=100, size=population_size)
-        self.new_population = create_new_population()
+        self.new_population = self.create_new_population()
 
     def create_new_population(self):
         # shuffle the population
         random.shuffle(self.population)
         new_population = []
         # create the pairs
-        for i in range(len(self.population)/2):
+        for i in range(int(len(self.population)/2)):
             self.parent = [self.population[2*i], self.population[2*i+1]]
         # create the children
             self.children = self.crossover(length=100, crossover_type='2X')
