@@ -1,23 +1,26 @@
 import random
+from operator import itemgetter
 from fitness import Fitness
-random.seed(42)
+random.seed(40)
 
 class GA:
     def __init__(self, population_size):
         self.population = self.generate_population(length=100, size=population_size)
         self.generation = 0
+        self.failed_generation = False
 
     def create_new_population(self):
         # shuffle the population
         random.shuffle(self.population)
         new_population = []
+        failed_offspring = False
         # create the pairs
         for i in range(int(len(self.population)/2)):
             self.parent = [self.population[2*i], self.population[2*i+1]]
         # create the children
             self.children = self.crossover(length=100, crossover_type='2X')
         # make them compete
-            selection = self.family_competition(k=2)
+            selection, failed_reproduction = self.family_competition(k=2)
         # return the new population
             new_population += selection
         self.population = new_population
@@ -53,8 +56,15 @@ class GA:
 
     def family_competition(self, k=2):
         family = self.parent + self.children
+
+        parent_fitness = [(solution, Fitness.count_ones(solution)) for solution in self.parent]
+        child_fitness = [(solution, Fitness.count_ones(solution)) for solution in self.children]
+
+        failed_reproduction = False
+        for baby_fitness in child_fitness:
+            failed_reproduction = baby_fitness[1] < min(parent_fitness, key=itemgetter(1))[1] 
         
-        family_fitness = [(solution, Fitness.count_ones(solution)) for solution in family]          
+        family_fitness = parent_fitness + child_fitness         
         sorted_family = sorted(family_fitness, key = lambda x: x[1], reverse=True)
         kth_best, kth1_best = sorted_family[k - 1], sorted_family[k]
 
@@ -63,7 +73,7 @@ class GA:
                 sorted_family[k - 1] = kth1_best
                 sorted_family[k] = kth_best
         
-        return [solution[0] for solution in sorted_family[:k]]
+        return [solution[0] for solution in sorted_family[:k]], failed_reproduction
     
     def global_optimum_found(self, length=100):
         global_optimum = '1' * length
