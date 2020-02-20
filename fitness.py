@@ -22,10 +22,11 @@ class Fitness:
     def trap_function_not_tight(solution, k, d):
         fitness = 0
         scalar = (k - d) / (k - 1)
-        spread = len(solution) / k
-        for start_point in spread:
+        spread = int(len(solution) / k)
+        for start_point in range(spread):
 
-            subsolution = [solution[i] for  in range(start_point, start_point + len(solution), spread)]
+            subsolution = [solution[i] for i in range(start_point, start_point + len(solution), spread)]
+            print(subsolution)
             if Fitness.count_ones(subsolution) == k:
                 fitness += k
             elif Fitness.count_ones(subsolution) < k:
