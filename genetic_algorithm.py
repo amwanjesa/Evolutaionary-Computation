@@ -60,8 +60,7 @@ class GA:
 
         parent_fitness = [(solution, Fitness.count_ones(solution)) for solution in self.parent]
         child_fitness = [(solution, Fitness.count_ones(solution)) for solution in self.children]
-
-        failed_reproduction = [baby_fitness[1] < min(parent_fitness, key=itemgetter(1))[1] for baby_fitness in child_fitness]
+        failed_reproduction = [baby_fitness[1] <= max(parent_fitness, key=itemgetter(1))[1] for baby_fitness in child_fitness]
         
         family_fitness = parent_fitness + child_fitness         
         sorted_family = sorted(family_fitness, key = lambda x: x[1], reverse=True)
