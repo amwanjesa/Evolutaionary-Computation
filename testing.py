@@ -1,5 +1,6 @@
-from genetic_algorithm import GA
 import pandas as pd
+
+from genetic_algorithm import GA
 
 if __name__ == "__main__":
     experiment_data = pd.DataFrame()
@@ -7,21 +8,19 @@ if __name__ == "__main__":
     found = 0
     gens = []
     for i in range(25):
-        ga = GA(120)
+        ga = GA(130)
 
         while not ga.global_optimum_found() and not ga.failed_generation:
             ga.create_new_population()
-        
+
         gens.append(ga.generation + 1)
 
         if not ga.global_optimum_found():
-            print(f'No global minimum :(')
+            print('No global minimum :(')
             not_found += 1
         else:
-            print(f'Found global minimum!')
+            print('Found global minimum!')
             found += 1
-        #import pdb; pdb.set_trace()
-        #print(stats[ga.generation])
         experiment_data[i] = ga.population_stats()
 
 exp_data = experiment_data.T

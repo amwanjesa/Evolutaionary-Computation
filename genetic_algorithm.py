@@ -1,11 +1,15 @@
 import random
 from operator import itemgetter
+
 from fitness import Fitness
+
 random.seed(40)
+
 
 class GA:
     def __init__(self, population_size):
-        self.population = self.generate_population(length=100, size=population_size)
+        self.population = self.generate_population(
+            length=100, size=population_size)
         self.generation = 0
         self.failed_generation = False
 
@@ -34,12 +38,15 @@ class GA:
         children = []
         if crossover_type == '2X':
             # two point crossover (2X)
-            cross_point = [random.randint(0, length), random.randint(0, length)]
+            cross_point = [random.randint(
+                0, length), random.randint(0, length)]
             while cross_point[0] == cross_point[1]:
                 cross_point[1] = random.randint(0, length)
             cross_point.sort()
-            children.append(self.parent[0][0:cross_point[0]] + self.parent[1][cross_point[0]:cross_point[1]] + self.parent[0][cross_point[1]:length])
-            children.append(self.parent[1][0:cross_point[0]] + self.parent[0][cross_point[0]:cross_point[1]] + self.parent[1][cross_point[1]:length])
+            children.append(self.parent[0][0:cross_point[0]] + self.parent[1]
+                            [cross_point[0]:cross_point[1]] + self.parent[0][cross_point[1]:length])
+            children.append(self.parent[1][0:cross_point[0]] + self.parent[0]
+                            [cross_point[0]:cross_point[1]] + self.parent[1][cross_point[1]:length])
             return children
         else:
             # uniform crossover (UX)
@@ -58,25 +65,29 @@ class GA:
 
     def family_competition(self, k=2):
 
-        parent_fitness = [(solution, Fitness.count_ones(solution)) for solution in self.parent]
-        child_fitness = [(solution, Fitness.count_ones(solution)) for solution in self.children]
-        failed_reproduction = [baby_fitness[1] <= max(parent_fitness, key=itemgetter(1))[1] for baby_fitness in child_fitness]
-        
-        family_fitness = parent_fitness + child_fitness         
-        sorted_family = sorted(family_fitness, key = lambda x: x[1], reverse=True)
+        parent_fitness = [(solution, Fitness.get_fitness(
+            solution, function='ones')) for solution in self.parent]
+        child_fitness = [(solution, Fitness.get_fitness(
+            solution, function='ones')) for solution in self.children]
+        failed_reproduction = [baby_fitness[1] <= max(parent_fitness, key=itemgetter(1))[
+            1] for baby_fitness in child_fitness]
+
+        family_fitness = parent_fitness + child_fitness
+        sorted_family = sorted(
+            family_fitness, key=lambda x: x[1], reverse=True)
         kth_best, kth1_best = sorted_family[k - 1], sorted_family[k]
 
         if kth_best[1] == kth_best[1]:
             if kth1_best[0] in self.parent and not kth_best in self.parent:
                 sorted_family[k - 1] = kth1_best
                 sorted_family[k] = kth_best
-        
+
         return [solution[0] for solution in sorted_family[:k]], failed_reproduction
-    
+
     def global_optimum_found(self, length=100):
         global_optimum = '1' * length
         return global_optimum in self.population
-        
+
     def generate_population(self, length=100, size=10):
         def get_binary_string(length):
             return ''.join((random.choice('01') for i in range(length)))
@@ -84,5 +95,4 @@ class GA:
         return [get_binary_string(length) for i in range(size)]
 
     def population_stats(self):
-        return [Fitness.count_ones(solution) for solution in self.population]
-            
+        return [Fitness.get_fitness(solution, function='ones') for solution in self.population]
