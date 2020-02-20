@@ -8,7 +8,7 @@ if __name__ == "__main__":
     found = 0
     gens = []
     for i in range(25):
-        ga = GA(130)
+        ga = GA(130, fitness_function='ones')
 
         while not ga.global_optimum_found() and not ga.failed_generation:
             ga.create_new_population()
@@ -21,7 +21,7 @@ if __name__ == "__main__":
         else:
             print('Found global minimum!')
             found += 1
-        experiment_data[i] = ga.population_stats()
+        experiment_data[f'Run {i + 1}'] = ga.population_stats()
 
 exp_data = experiment_data.T
 print(experiment_data)

@@ -7,11 +7,12 @@ random.seed(40)
 
 
 class GA:
-    def __init__(self, population_size):
+    def __init__(self, population_size, fitness_function='ones'):
         self.population = self.generate_population(
             length=100, size=population_size)
         self.generation = 0
         self.failed_generation = False
+        self.fitness_function = fitness_function
 
     def create_new_population(self):
         # shuffle the population
@@ -66,9 +67,9 @@ class GA:
     def family_competition(self, k=2):
 
         parent_fitness = [(solution, Fitness.get_fitness(
-            solution, function='ones')) for solution in self.parent]
+            solution, function=self.fitness_function)) for solution in self.parent]
         child_fitness = [(solution, Fitness.get_fitness(
-            solution, function='ones')) for solution in self.children]
+            solution, function=self.fitness_function)) for solution in self.children]
         failed_reproduction = [baby_fitness[1] <= max(parent_fitness, key=itemgetter(1))[
             1] for baby_fitness in child_fitness]
 
@@ -95,4 +96,4 @@ class GA:
         return [get_binary_string(length) for i in range(size)]
 
     def population_stats(self):
-        return [Fitness.get_fitness(solution, function='ones') for solution in self.population]
+        return [Fitness.get_fitness(solution, function=self.fitness_function) for solution in self.population]
