@@ -10,7 +10,7 @@ if __name__ == "__main__":
         ga = GA(120)
         stats = {ga.generation: ga.population_stats()}
 
-        while not ga.global_optimum_found() and ga.generation < 1000:
+        while not ga.global_optimum_found() and ga.generation < 1000 and not ga.failed_generation:
             ga.create_new_population()
             stats[ga.generation] = ga.population_stats()
         

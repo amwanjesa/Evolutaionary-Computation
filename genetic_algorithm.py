@@ -13,7 +13,7 @@ class GA:
         # shuffle the population
         random.shuffle(self.population)
         new_population = []
-        failed_offspring = False
+        failed_offspring = []
         # create the pairs
         for i in range(int(len(self.population)/2)):
             self.parent = [self.population[2*i], self.population[2*i+1]]
@@ -21,8 +21,10 @@ class GA:
             self.children = self.crossover(length=100, crossover_type='2X')
         # make them compete
             selection, failed_reproduction = self.family_competition(k=2)
+            failed_offspring += failed_reproduction
         # return the new population
             new_population += selection
+        self.failed_generation = all(failed_offspring)
         self.population = new_population
         self.generation += 1
 
@@ -55,14 +57,11 @@ class GA:
             return children
 
     def family_competition(self, k=2):
-        family = self.parent + self.children
 
         parent_fitness = [(solution, Fitness.count_ones(solution)) for solution in self.parent]
         child_fitness = [(solution, Fitness.count_ones(solution)) for solution in self.children]
 
-        failed_reproduction = False
-        for baby_fitness in child_fitness:
-            failed_reproduction = baby_fitness[1] < min(parent_fitness, key=itemgetter(1))[1] 
+        failed_reproduction = [baby_fitness[1] < min(parent_fitness, key=itemgetter(1))[1] for baby_fitness in child_fitness]
         
         family_fitness = parent_fitness + child_fitness         
         sorted_family = sorted(family_fitness, key = lambda x: x[1], reverse=True)
