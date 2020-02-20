@@ -9,7 +9,7 @@ def run_experiment():
     successful_generations = pd.DataFrame(columns=['n_generations', 'success'])
 
     tic = time.perf_counter()
-    population_size = 130
+    population_size = 40
     fitness_function = 'ones'
     for i in range(25):
         ga = GA(population_size, fitness_function=fitness_function)
@@ -23,6 +23,7 @@ def run_experiment():
 
     toc = time.perf_counter()
     print(f" in {toc - tic:0.4f} seconds")
+    #print(successful_generations.success.value_counts())
 
     #generation_fitness.to_csv(
     #    f'generation_fitness_n_{population_size}_{fitness_function}.csv')
@@ -44,10 +45,8 @@ def run_experiment():
         'Average fitness': [average_fitness], 'SD fitness': [sd_fitness],
         'CPU time': [cpu_time]})
 
-    print(table_data)
-
     table_data.to_csv(
-        f'table_data_{population_size}_{fitness_function}.csv')
+        f'table_data_{population_size}_{fitness_function}_UX.csv')
 
 if __name__ == "__main__":
     run_experiment()
