@@ -1,20 +1,30 @@
 from genetic_algorithm import GA
+import pandas as pd
 
 if __name__ == "__main__":
-    ga = GA(70)
-    stats = {ga.generation: ga.population_stats()}
+    experiment_data = pd.DataFrame()
+    #not_found = 0
+    #found = 0
+    for i in range(25):
+        ga = GA(120)
+        stats = {ga.generation: ga.population_stats()}
 
-    i = 0
-    iterations = 1000
-    while not ga.global_optimum_found() and i < iterations:
-        i += 1
-        ga.create_new_population()
-        stats[ga.generation] = ga.population_stats()
-        #print(i)
+        while not ga.global_optimum_found() and ga.generation < 1000:
+            ga.create_new_population()
+            stats[ga.generation] = ga.population_stats()
 
-    if i == iterations:
-        print(f'No global minimum :(')
-    else:
-        print(f'Found global minimum!')
-    print(stats)
-    
+        if not ga.global_optimum_found():
+            print(f'No global minimum :(')
+            #not_found += 1
+        else:
+            print(f'Found global minimum!')
+            #found += 1
+
+        #print(stats[ga.generation])
+        # I will fix this later
+        experiment_data = experiment_data.append(stats[ga.generation])
+
+
+#print(experiment_data)
+#print(not_found)
+#print(found)
