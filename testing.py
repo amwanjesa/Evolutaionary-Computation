@@ -1,30 +1,30 @@
 import pandas as pd
+import time
 
 from genetic_algorithm import GA
 
 if __name__ == "__main__":
-    experiment_data = pd.DataFrame()
-    not_found = 0
-    found = 0
-    gens = []
+
+    generation_fitness = pd.DataFrame()
+    successful_generations = pd.DataFrame(columns=['n_generations', 'success'])
+
+    tic = time.perf_counter()
+    population_size = 130
+    fitness_function = 'ones'
     for i in range(25):
-        ga = GA(130, fitness_function='ones')
+        ga = GA(population_size, fitness_function=fitness_function)
 
         while not ga.global_optimum_found() and not ga.failed_generation:
             ga.create_new_population()
 
-        gens.append(ga.generation + 1)
+        successful_generations = successful_generations.append({'n_generations': ga.generation + 1,
+                           'success': ga.global_optimum_found()}, ignore_index=True)
+        generation_fitness[f'Run {i + 1}'] = ga.population_stats()
 
-        if not ga.global_optimum_found():
-            print('No global minimum :(')
-            not_found += 1
-        else:
-            print('Found global minimum!')
-            found += 1
-        experiment_data[f'Run {i + 1}'] = ga.population_stats()
+    toc = time.perf_counter()
+    print(f" in {toc - tic:0.4f} seconds")
 
-exp_data = experiment_data.T
-print(experiment_data)
-print(not_found)
-print(found)
-print(gens)
+generation_fitness.to_csv(
+    f'generation_fitness_n_{population_size}_{fitness_function}.csv')
+successful_generations.to_csv(
+    f'successful_generations_n_{population_size}_{fitness_function}.csv')
