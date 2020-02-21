@@ -10,7 +10,7 @@ def run_experiment():
 
     tic = time.perf_counter()
     population_size = 40
-    fitness_function = 'ones'
+    fitness_function = 'trap tight'
     for i in range(25):
         ga = GA(population_size, fitness_function=fitness_function)
 
