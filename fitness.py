@@ -4,7 +4,7 @@ class Fitness:
         pass
 
     @staticmethod
-    def get_fitness(solution, function='ones', k=4, d=2):
+    def get_fitness(solution, function='ones', k=None, d=None):
         if function == 'ones':
             return Fitness.count_ones(solution)
         elif function == 'trap tight':
@@ -44,7 +44,7 @@ class Fitness:
 
             subsolution = [solution[i] for i in range(
                 start_point, start_point + len(solution), spread)]
-            print(subsolution)
+            #print(subsolution)
             if Fitness.count_ones(subsolution) == k:
                 fitness += k
             elif Fitness.count_ones(subsolution) < k:
