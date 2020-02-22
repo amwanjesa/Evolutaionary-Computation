@@ -41,7 +41,7 @@ class GA:
         self.failed_generation = all(failed_offspring)
         self.population = new_population
         self.generation += 1
-        return sum(selection_errors)
+        return selection_errors, parent_disagreements
 
     def crossover(self, length=100, crossover_type='2X'):
         # choose crossover type (two point or uniform)

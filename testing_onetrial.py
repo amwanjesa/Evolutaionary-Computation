@@ -21,7 +21,7 @@ def run_experiment():
     ga = GA(population_size, fitness_function=fitness_function)
 
     while not ga.global_optimum_found() and not ga.failed_generation:
-        selection_errors.append(ga.create_new_population())
+        errors, disagreements = ga.create_new_population()
         generation_fitness[f'{i+1}'] = ga.population_stats()
         population_members[f'{i+1}'] = ga.new_pop()
         i += 1
