@@ -16,11 +16,12 @@ def run_experiment():
     tic = time.perf_counter()
     population_size = 250
     fitness_function = 'ones'
+    selection_errors = []
 
     ga = GA(population_size, fitness_function=fitness_function)
 
     while not ga.global_optimum_found() and not ga.failed_generation:
-        ga.create_new_population()
+        selection_errors.append(ga.create_new_population())
         generation_fitness[f'{i+1}'] = ga.population_stats()
         population_members[f'{i+1}'] = ga.new_pop()
         i += 1
