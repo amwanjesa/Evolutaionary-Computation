@@ -66,12 +66,12 @@ def run_experiment():
 
     population_fitness_transposed = population_fitness.T
 
-    #plt.errorbar((np.arange(53)+1), population_fitness_transposed[0], population_fitness_transposed[2], fmt = 'bo', label = 'Zeros')
-    #plt.errorbar((np.arange(53)+1), population_fitness_transposed[1], population_fitness_transposed[3], fmt = 'ro', label = 'Ones') #ones
-    #plt.xlabel('Generation')
-    #plt.ylabel('Fitness')
-    #plt.legend()
-    #plt.show()
+    plt.errorbar((np.arange(i)+1), population_fitness_transposed[0], population_fitness_transposed[2], fmt = 'bo', label = 'Zeros')
+    plt.errorbar((np.arange(i)+1), population_fitness_transposed[1], population_fitness_transposed[3], fmt = 'ro', label = 'Ones') #ones
+    plt.xlabel('Generation')
+    plt.ylabel('Fitness')
+    plt.legend()
+    plt.show()
 
     #generation_fitness.to_csv(f'generation_fitness.csv')
     #population_members.to_csv(f'population_members.csv')

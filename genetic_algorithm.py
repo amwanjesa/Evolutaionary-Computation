@@ -23,7 +23,7 @@ class GA:
         for i in range(int(len(self.population)/2)):
             self.parent = [self.population[2*i], self.population[2*i+1]]
         # create the children
-            self.children = self.crossover(length=100, crossover_type='2X')
+            self.children = self.crossover(length=100, crossover_type='UX')
         # make them compete
             selection, failed_reproduction = self.family_competition(k=2)
             failed_offspring += failed_reproduction
@@ -32,6 +32,11 @@ class GA:
         self.failed_generation = all(failed_offspring)
         self.population = new_population
         self.generation += 1
+        return self.population
+
+    def new_pop(self):
+        pop = self.create_new_population()
+        return pop
 
     def crossover(self, length=100, crossover_type='2X'):
         # choose crossover type (two point or uniform)
