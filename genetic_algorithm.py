@@ -20,20 +20,24 @@ class GA:
         new_population = []
         failed_offspring = []
         # create the pairs
-        selection_errors = []
+        selection_errors = 0
+        parent_disagreements = 0
         for i in range(int(len(self.population)/2)):
             self.parent = [self.population[2*i], self.population[2*i+1]]
             # create the children
             self.children = self.crossover(length=100, crossover_type='2X')
             # make them compete
             selection, failed_reproduction = self.family_competition(k=2)
-            selection_errors.append(self.selection_error(selection))
+            errors, disagreements = self.selection_error(selection)
+            selection_errors += errors
+            parent_disagreements += disagreements
 
             failed_offspring += failed_reproduction
             # return the new population
             new_population += selection
-            print(f'Number of selection errors: {selection_errors[-1]}')
 
+        print(f'Number of selection errors: {selection_errors}')
+        print(f'Number of parent disagreements: {parent_disagreements}')
         self.failed_generation = all(failed_offspring)
         self.population = new_population
         self.generation += 1
@@ -73,11 +77,11 @@ class GA:
     def selection_error(self, selection):
         diffs = [int(x) & int(y) for x, y in zip(*self.parent)]
         number_of_errors = 0
-        print(f'Number of disagreements: {len([x for x in diffs if not x])}')
+        number_of_disagreements = len([x for x in diffs if not x])
         for i, x in enumerate(diffs):
             number_of_errors += int(not x and not (
                 int(selection[0][i]) & int(selection[1][i])))
-        return number_of_errors
+        return number_of_errors, number_of_disagreements
 
     def family_competition(self, k=2):
 
