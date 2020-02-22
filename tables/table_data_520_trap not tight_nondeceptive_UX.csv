@@ -1,2 +1,2 @@
-,Population size,Average generations,SD generations,Average fitness,SD fitness,CPU time
-0,520,373.24,33.74941974809838,80.8791923076923,1.919723305379543,603.625517824
+,Population size,Average generations,SD generations,Average fitness,SD fitness,CPU time,Average CPU time,SD CPU time
+0,520,373.24,33.74941974809838,80.8791923076923,1.919723305379543,607.152323113,24.286091577439993,2.2208129773572907
