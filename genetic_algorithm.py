@@ -33,7 +33,7 @@ class GA:
             # return the new population
             new_population += selection
             print(f'Number of selection errors: {selection_errors[-1]}')
-        
+
         self.failed_generation = all(failed_offspring)
         self.population = new_population
         self.generation += 1
@@ -69,13 +69,14 @@ class GA:
                     child_2 += self.parent[1][i]
             children = [child_1, child_2]
             return children
-    
+
     def selection_error(self, selection):
         diffs = [int(x) & int(y) for x, y in zip(*self.parent)]
         number_of_errors = 0
         print(f'Number of disagreements: {len([x for x in diffs if not x])}')
         for i, x in enumerate(diffs):
-            number_of_errors += int(not x and not (int(selection[0][i]) & int(selection[1][i])))
+            number_of_errors += int(not x and not (
+                int(selection[0][i]) & int(selection[1][i])))
         return number_of_errors
 
     def family_competition(self, k=2):
