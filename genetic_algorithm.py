@@ -36,8 +36,8 @@ class GA:
             # return the new population
             new_population += selection
 
-        print(f'Number of selection errors: {selection_errors}')
-        print(f'Number of parent disagreements: {parent_disagreements}')
+        #print(f'Number of selection errors: {selection_errors}')
+        #print(f'Number of parent disagreements: {parent_disagreements}')
         self.failed_generation = all(failed_offspring)
         self.population = new_population
         self.generation += 1
