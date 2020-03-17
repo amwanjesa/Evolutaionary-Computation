@@ -7,34 +7,19 @@ from graph import *
 
 def read_graph_data(filename):
 
-    graph_data = {}
+    graph = Graph()
     with open(filename) as f:
         for line in f:
             l = line.split()
             if len(l) > 0:
-                graph_data[l[0]] = {'coordinates': l[1],
-                                    'degree': l[2], 'ID_connections': l[3:]}
-    return graph_data
-
-
-def random_initial_partitioning(graph_data):
-
-    nodes = list(graph_data.keys())
-    shuffle(nodes)
-
-    partition_a = {node: graph_data[node] for node in nodes[:len(nodes) // 2]}
-    partition_b = {node: graph_data[node] for node in nodes[len(nodes) // 2:]}
-
-    return partition_a, partition_b
-
-
-def get_node_gain():
-    pass
-
+                graph.add_node(l[0], l[2])
+                for node in l[3:]:
+                    graph.add_edge(l[0], node)
+    return graph
 
 if __name__ == '__main__':
 
     np.random.seed(352)
 
     graph = read_graph_data('Graph500.txt')
-    partitions = random_initial_partitioning(graph)
+    graph.init_partition()
