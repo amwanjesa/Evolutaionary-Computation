@@ -38,8 +38,28 @@ class Graph:
     def contains_node(self, node):
         return node in self.nodes
 
+    def contains_node_id(self, node_id):
+        return node_id in [node.id for node in self.nodes]
+
     def contains_edge(self, edge):
         return edge in self.edges
+
+    def calculate_gain(self, node):
+        gain = 0
+        set_for_calc = set([node.id])
+        for edge in self.associated_edges(node):
+            counterpart = (edge.pair - set_for_calc).pop()
+
+            if not self.block_a.contains_node_id(counterpart):
+                gain += 1
+            else:
+                gain -= 1
+        return gain
+
+    def associated_edges(self, node):
+        for edge in self.edges:
+            if node.id in edge.pair:
+                yield edge
 
 
 class Block(Graph):
