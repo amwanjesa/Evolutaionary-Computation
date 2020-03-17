@@ -32,5 +32,16 @@ class Graph:
     def init_partition(self):
         shuffle(self.nodes)
 
-        self.block_a = self.nodes[:len(self.nodes) // 2]
-        self.block_b = self.nodes[:len(self.nodes) // 2]
+        self.block_a = Block(self.nodes[:len(self.nodes) // 2], self.edges)
+        self.block_b = Block(self.nodes[:len(self.nodes) // 2], self.edges)
+
+    def contains_node(self, node):
+        return node in self.nodes
+
+    def contains_edge(self, edge):
+        return edge in self.edges
+
+
+class Block(Graph):
+    def __init__(self, nodes=[], edges=[]):
+        super().__init__(nodes=nodes, edges=edges)
