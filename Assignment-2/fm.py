@@ -1,7 +1,3 @@
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
-from random import shuffle
 from graph import *
 
 
@@ -17,9 +13,7 @@ def read_graph_data(filename):
                     graph.add_edge(l[0], node)
     return graph
 
+
 if __name__ == '__main__':
-
-    np.random.seed(352)
-
     graph = read_graph_data('Graph500.txt')
     graph.init_partition()
