@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from random import shuffle
+from graph import *
 
 
 def read_graph_data(filename):
@@ -21,10 +22,14 @@ def random_initial_partitioning(graph_data):
     nodes = list(graph_data.keys())
     shuffle(nodes)
 
-    partition_a = { node: graph_data[node] for node in nodes[:len(nodes) // 2]}
-    partition_b = { node: graph_data[node] for node in nodes[len(nodes) // 2:]}
+    partition_a = {node: graph_data[node] for node in nodes[:len(nodes) // 2]}
+    partition_b = {node: graph_data[node] for node in nodes[len(nodes) // 2:]}
 
     return partition_a, partition_b
+
+
+def get_node_gain():
+    pass
 
 
 if __name__ == '__main__':
