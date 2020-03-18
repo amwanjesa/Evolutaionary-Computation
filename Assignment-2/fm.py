@@ -9,16 +9,14 @@ def read_graph_data(filename):
         for line in f:
             l = line.split()
             if len(l) > 0:
-                connections.append(l[3:])
+                graph.add_connection(l[3:])
                 graph.add_node(l[0], l[2])
                 for node in l[3:]:
                     graph.add_edge(l[0], node)
-        net = graph.create_network(connections)
 
-    return graph, net
+    return graph
 
 
 if __name__ == '__main__':
-    graph, net = read_graph_data('Graph500.txt')
-    print(net)
+    graph = read_graph_data('Graph500.txt')
     graph.init_partition()

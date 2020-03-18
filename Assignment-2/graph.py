@@ -14,9 +14,10 @@ class Edge:
 
 
 class Graph:
-    def __init__(self, nodes=[], edges=[]):
+    def __init__(self, nodes=[], edges=[], connections=[]):
         self.nodes = nodes
         self.edges = edges
+        self.connections = connections
         self.block_a = None
         self.block_b = None
 
@@ -28,6 +29,9 @@ class Graph:
         new_edge = Edge(source, target)
         if not new_edge in self.edges:
             self.edges.append(new_edge)
+
+    def add_connection(self, connections):
+        self.connections.append(connections)
 
     def init_partition(self):
         shuffle(self.nodes)
@@ -60,6 +64,24 @@ class Graph:
         for edge in self.edges:
             if node.id in edge.pair:
                 yield edge
+
+    def create_network(self):
+        net = []
+        counter = 0
+        for i in self.connections:
+            counter += 1 
+            for j in i:
+                #intersection of i and connections[j]
+                inters = list(set(i).intersection(set(self.connections[int(j)-1])))
+                if len(inters) > 0: 
+                    inters.extend([str(counter), j])
+                    inters.sort()
+                else:
+                    inters.extend([str(counter), j])
+                    inters.sort()
+                if inters not in net:
+                    net.append(inters)
+        return net
 
 
 class Block(Graph):
