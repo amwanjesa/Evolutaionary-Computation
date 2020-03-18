@@ -91,6 +91,16 @@ class Graph:
                 critical_network.append(network)
         return critical_network
 
+    def possible_nodes(self, list_nodes):
+        gains = []
+        possible_gains = []
+        for node in list_nodes:
+            gains.append([self.calculate_gain(node), node.id])
+        for gain in gains: 
+            if gain[0] == max(gains)[0]:
+                possible_gains.append(gain)
+        print(possible_gains)
+
 
 class Block(Graph):
     def __init__(self, nodes=[], edges=[]):
