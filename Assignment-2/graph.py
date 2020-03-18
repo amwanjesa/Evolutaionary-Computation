@@ -83,6 +83,13 @@ class Graph:
                     net.append(inters)
         return net
 
+    def critical_network(self, base_cell):
+        critical_network = []
+        for network in self.connections:
+            if base_cell in network and len(network) < 4:
+                critical_network.append(network)
+        return critical_network
+
 
 class Block(Graph):
     def __init__(self, nodes=[], edges=[]):
