@@ -84,9 +84,10 @@ class Graph:
         return net
 
     def critical_network(self, base_cell):
+        net = self.create_network()
         critical_network = []
-        for network in self.connections:
-            if base_cell in network and len(network) < 4:
+        for network in net:
+            if str(base_cell) in network and len(network) < 4:
                 critical_network.append(network)
         return critical_network
 
