@@ -48,6 +48,16 @@ class Graph:
     def contains_edge(self, edge):
         return edge in self.edges
 
+    def setup_gains(self):
+        self.gain_storage_a = Gains(max([node.degree for node in self.nodes]))
+        self.gain_storage_b = Gains(max([node.degree for node in self.nodes]))
+        for node in self.nodes:
+            gain = self.calculate_gain(node)
+            if self.block_a.contains_node(node):
+                self.gain_storage_a.save_node_at_gain(node, gain)
+            else:
+                self.gain_storage_b.save_node_at_gain(node, gain)
+
     def calculate_gain(self, node):
         gain = 0
         set_for_calc = set([node.id])
@@ -66,7 +76,7 @@ class Graph:
                 yield edge
 
     def create_network(self):
-        net = []
+        nets = []
         counter = 0
         for i in self.connections:
             counter += 1 
@@ -79,22 +89,21 @@ class Graph:
                 else:
                     inters.extend([str(counter), j])
                     inters.sort()
-                if inters not in net:
-                    net.append(inters)
-        return net
+                if inters not in nets:
+                    nets.append(inters)
+        self.nets = nets
 
     def critical_network(self, base_cell):
-        net = self.create_network()
         critical_network = []
         for network in net:
             if str(base_cell) in network and len(network) < 4:
                 critical_network.append(network)
         return critical_network
 
-    def possible_nodes(self, list_nodes):
+    def possible_nodes(self):
         gains = []
         possible_gains = []
-        for node in list_nodes:
+        for node in self.nodes:
             gains.append([self.calculate_gain(node), node.id])
         for gain in gains: 
             if gain[0] == max(gains)[0]:
@@ -105,3 +114,23 @@ class Graph:
 class Block(Graph):
     def __init__(self, nodes=[], edges=[]):
         super().__init__(nodes=nodes, edges=edges)
+
+class Gains:
+    def __init__(self, max_degree):
+        self.max_degree = max_degree
+        self.records = {i: set() for i in range(-max_degree, max_degree + 1)}
+        self.highest_gain = 0
+    
+    def get_nodes_at_gain(self, gain_value):
+        return self.records[gain_value]
+
+    def save_node_at_gain(self, node, gain_value):
+        self.records[gain_value].add(node)
+        self.update_highest_gain()
+
+    def update_highest_gain(self):
+        for i in range(self.max_degree, -self.max_degree - 1, -1):
+            if i in self.records:
+                self.highest_gain = i
+                break
+
