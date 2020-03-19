@@ -146,6 +146,8 @@ class Graph:
         node = largest_block.gain_storage.get_node_with_highest_gain()
 
         # Remove node from current block and move it to the other one
+        # Mark moved node as not free
+        # Updated gains using self.setup_gains
         
 
 
@@ -158,6 +160,10 @@ class Block(Graph):
     @property
     def size(self):
         return len(self.nodes)
+
+    def remove_node(self, node):
+        self.nodes.remove(node)
+        self.gain_storage.remove_node(node)
 
 
 class Gains:
@@ -177,7 +183,13 @@ class Gains:
         return self.records[self.highest_gain]
 
     def update_highest_gain(self):
-        for i in range(self.max_degree, -self.max_degree - 1, -1):
-            if i in self.records:
+        for i in self.records.keys():
+            if self.records[i]:
                 self.highest_gain = i
+                break
+    
+    def remove_node(self, node):
+        for gain, nodes in self.records.items():
+            if node in nodes:
+                self.records[gain].remove(node)
                 break
