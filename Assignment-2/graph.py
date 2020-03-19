@@ -140,16 +140,30 @@ class Graph:
             if new_cutstate < self.current_cutstate:
                 self.initial_solution = self.get_solution()
                 self.current_cutstate = new_cutstate
-    
-    def bipartioning(self):
+   
+    def bipartitioning(self):
         largest_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
         node = largest_block.gain_storage.get_node_with_highest_gain()
 
         # Remove node from current block and move it to the other one
+        largest_block.remove_node(node)
+        other_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
+        other_block.nodes.append(node)
         # Mark moved node as not free
+        node.free = False
         # Updated gains using self.setup_gains
-        
+        self.setup_gains()
 
+        # Select new node
+        node = other_block.gain_storage.get_node_with_highest_gain()
+        # Remove node from current block
+        other_block.remove_node(node)
+        # Move it to the other block
+        largest_block.nodes.append(node)
+        # Set node to false
+        node.free = False
+        # Gains update
+        self.setup_gains()
 
 
 class Block(Graph):
