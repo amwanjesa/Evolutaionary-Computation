@@ -6,6 +6,7 @@ class Node:
     def __init__(self, id, degree):
         self.id = id
         self.degree = degree
+        self.free = True
 
 
 class Edge:
