@@ -113,7 +113,7 @@ class Graph:
     def get_solution(self):
         solution = []
         for node in self.nodes:
-            if node.id in self.block_a.nodes.id:
+            if self.block_a.nodes.contains_node(node):
                 solution.append(1)
             else:
                 solution.append(0)
