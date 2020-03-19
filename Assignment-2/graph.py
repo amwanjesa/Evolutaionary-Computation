@@ -21,8 +21,8 @@ class Graph:
         self.connections = connections
         self.block_a = None
         self.block_b = None
-        self.initial_solution = self.get_solution()
-        self.initial_cutstate = self.get_cutstate()
+        self.current_solution = []
+        self.current_cutstate = None
 
     def add_node(self, id, degree):
         new_node = Node(id, degree)
@@ -32,6 +32,9 @@ class Graph:
         new_edge = Edge(source, target)
         if not new_edge in self.edges:
             self.edges.append(new_edge)
+        
+    def remove_node(self, node):
+        self.nodes.remove(node)
 
     def add_connection(self, connections):
         self.connections.append(connections)
@@ -52,14 +55,14 @@ class Graph:
         return edge in self.edges
 
     def setup_gains(self):
-        self.gain_storage_a = Gains(max([node.degree for node in self.nodes]))
-        self.gain_storage_b = Gains(max([node.degree for node in self.nodes]))
+        self.block_a.gain_storage = Gains(max([node.degree for node in self.nodes]))
+        self.block_b.gain_storage = Gains(max([node.degree for node in self.nodes]))
         for node in self.nodes:
             gain = self.calculate_gain(node)
             if self.block_a.contains_node(node):
-                self.gain_storage_a.save_node_at_gain(node, gain)
+                self.block_a.gain_storage.save_node_at_gain(node, gain)
             else:
-                self.gain_storage_b.save_node_at_gain(node, gain)
+                self.block_b.gain_storage.save_node_at_gain(node, gain)
 
     def calculate_gain(self, node):
         gain = 0
@@ -133,13 +136,28 @@ class Graph:
 
     def update_solution(self):
         new_cutstate = self.get_cutstate()
-        if new_cutstate < self.initial_cutstate:
-            self.initial_solution = self.get_solution()
-            self.initial_cutstate = new_cutstate
+        if self.current_cutstate is not None:
+            if new_cutstate < self.current_cutstate:
+                self.initial_solution = self.get_solution()
+                self.current_cutstate = new_cutstate
+    
+    def bipartioning(self):
+        largest_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
+        node = largest_block.gain_storage.get_node_with_highest_gain()
+
+        # Remove node from current block and move it to the other one
+        
+
+
 
 class Block(Graph):
     def __init__(self, nodes=[], edges=[]):
         super().__init__(nodes=nodes, edges=edges)
+        self.gain_storage = None
+
+    @property
+    def size(self):
+        return len(self.nodes)
 
 
 class Gains:
@@ -154,6 +172,9 @@ class Gains:
     def save_node_at_gain(self, node, gain_value):
         self.records[gain_value].add(node)
         self.update_highest_gain()
+
+    def get_node_with_highest_gain(self):
+        return self.records[self.highest_gain]
 
     def update_highest_gain(self):
         for i in range(self.max_degree, -self.max_degree - 1, -1):
