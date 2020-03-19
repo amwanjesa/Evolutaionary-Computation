@@ -60,11 +60,9 @@ class Graph:
 
     def calculate_gain(self, node):
         gain = 0
-        set_for_calc = set([node.id])
-        for edge in self.associated_edges(node):
-            counterpart = (edge.pair - set_for_calc).pop()
-
-            if not self.block_a.contains_node_id(counterpart):
+        node_block = self.block_a if self.block_a.contains_node(node) else self.block_b
+        for net in self.critical_network(node.id):
+            if all([node_block.contains_node_id(cell) for cell in net]):
                 gain += 1
             else:
                 gain -= 1
@@ -95,7 +93,7 @@ class Graph:
 
     def critical_network(self, base_cell):
         critical_network = []
-        for network in net:
+        for network in self.nets:
             if str(base_cell) in network and len(network) < 4:
                 critical_network.append(network)
         return critical_network
