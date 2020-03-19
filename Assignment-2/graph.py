@@ -21,6 +21,8 @@ class Graph:
         self.connections = connections
         self.block_a = None
         self.block_b = None
+        self.initial_solution = self.get_solution()
+        self.initial_cutstate = self.get_cutstate()
 
     def add_node(self, id, degree):
         new_node = Node(id, degree)
@@ -128,6 +130,12 @@ class Graph:
                     if not all([self.block_a.contains_node_id(cell) for cell in net]):
                         cutstate += 1
         return cutstate
+
+    def update_solution(self):
+        new_cutstate = self.get_cutstate()
+        if new_cutstate < self.initial_cutstate:
+            self.initial_solution = self.get_solution()
+            self.initial_cutstate = new_cutstate
 
 class Block(Graph):
     def __init__(self, nodes=[], edges=[]):
