@@ -60,7 +60,8 @@ class Graph:
 
     def calculate_gain(self, node):
         gain = 0
-        node_block = self.block_a if self.block_a.contains_node(node) else self.block_b
+        node_block = self.block_a if self.block_a.contains_node(
+            node) else self.block_b
         for net in self.critical_network(node.id):
             if all([node_block.contains_node_id(cell) for cell in net]):
                 gain += 1
@@ -77,11 +78,12 @@ class Graph:
         nets = []
         counter = 0
         for i in self.connections:
-            counter += 1 
+            counter += 1
             for j in i:
-                #intersection of i and connections[j]
-                inters = list(set(i).intersection(set(self.connections[int(j)-1])))
-                if len(inters) > 0: 
+                # intersection of i and connections[j]
+                inters = list(set(i).intersection(
+                    set(self.connections[int(j)-1])))
+                if len(inters) > 0:
                     inters.extend([str(counter), j])
                     inters.sort()
                 else:
@@ -103,7 +105,7 @@ class Graph:
         possible_gains = []
         for node in self.nodes:
             gains.append([self.calculate_gain(node), node.id])
-        for gain in gains: 
+        for gain in gains:
             if gain[0] == max(gains)[0]:
                 possible_gains.append(gain)
         print(possible_gains)
@@ -113,12 +115,13 @@ class Block(Graph):
     def __init__(self, nodes=[], edges=[]):
         super().__init__(nodes=nodes, edges=edges)
 
+
 class Gains:
     def __init__(self, max_degree):
         self.max_degree = max_degree
         self.records = {i: set() for i in range(-max_degree, max_degree + 1)}
         self.highest_gain = 0
-    
+
     def get_nodes_at_gain(self, gain_value):
         return self.records[gain_value]
 
@@ -131,4 +134,3 @@ class Gains:
             if i in self.records:
                 self.highest_gain = i
                 break
-

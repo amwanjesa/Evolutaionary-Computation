@@ -21,5 +21,5 @@ if __name__ == '__main__':
     graph = read_graph_data('Graph500.txt')
     graph.create_network()
     graph.init_partition()
-    import pdb; pdb.set_trace()
     graph.setup_gains()
+    import pdb; pdb.set_trace()
