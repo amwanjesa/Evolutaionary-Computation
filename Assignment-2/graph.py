@@ -110,6 +110,15 @@ class Graph:
                 possible_gains.append(gain)
         print(possible_gains)
 
+    def get_solution(self):
+        solution = []
+        for node in self.nodes:
+            if node.id in self.block_a.nodes.id:
+                solution.append(1)
+            else:
+                solution.append(0)
+        return solution
+
 
 class Block(Graph):
     def __init__(self, nodes=[], edges=[]):
