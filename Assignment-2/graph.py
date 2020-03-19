@@ -121,16 +121,11 @@ class Graph:
 
     def get_cutstate(self):
         cutstate = 0
-        for node in self.nodes:
-            # 1 if it is in A, 0 otherwise
-            node_block = node.id in self.block_a.nodes.id
+        for node in self.block_a.nodes:
             for net in self.nets:
                 if node.id in net:
-                    for connected_net in net:
-                        if connected_net in self.block_a.nodes.id and not node_block:
-                            cutstate += 1
-                        if connected_net in self.block_b.nodes.id and node_block:
-                            cutstate += 1
+                    if not all([self.block_a.contains_node_id(cell) for cell in net]):
+                        cutstate += 1
         return cutstate
 
 class Block(Graph):
