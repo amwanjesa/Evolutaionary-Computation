@@ -165,6 +165,9 @@ class Graph:
         # Gains update
         self.setup_gains()
 
+        # Calculate new solution
+        self.update_solution()
+
 
 class Block(Graph):
     def __init__(self, nodes=[], edges=[]):
