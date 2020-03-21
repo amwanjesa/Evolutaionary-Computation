@@ -21,7 +21,7 @@ class Graph:
         self.connections = connections
         self.block_a = None
         self.block_b = None
-        self.current_solution = []
+        self.initial_solution = []
         self.current_cutstate = None
 
     def add_node(self, id, degree):
@@ -119,7 +119,7 @@ class Graph:
     def get_solution(self):
         solution = []
         for node in self.nodes:
-            if self.block_a.nodes.contains_node(node):
+            if self.block_a.contains_node(node):
                 solution.append(1)
             else:
                 solution.append(0)

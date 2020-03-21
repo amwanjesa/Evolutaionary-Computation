@@ -22,5 +22,5 @@ if __name__ == '__main__':
     graph.create_network()
     graph.init_partition()
     graph.setup_gains()
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
     graph.bipartitioning()
