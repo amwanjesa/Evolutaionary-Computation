@@ -47,7 +47,7 @@ class Block:
         for gain, nodes in self.gains_storage.items():
             if node in nodes:
                 self.gains_storage[gain].remove(node)
-                break
+                #break
         
 
     def contains_node(self, node):
