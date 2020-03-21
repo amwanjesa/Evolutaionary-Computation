@@ -140,6 +140,9 @@ class Graph:
             if new_cutstate < self.current_cutstate:
                 self.initial_solution = self.get_solution()
                 self.current_cutstate = new_cutstate
+        else:
+            self.initial_solution = self.get_solution()
+            self.current_cutstate = new_cutstate
    
     def bipartitioning(self):
         largest_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
