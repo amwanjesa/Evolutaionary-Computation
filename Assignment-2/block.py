@@ -24,6 +24,8 @@ class Block:
         self.update_highest_gain()
 
     def get_free_node_with_highest_gain(self):
+        #for node in self.gains_storage[self.highest_gain]:
+        #    print(f'\n {len(self.freedoms)}')
         return [node for node in self.gains_storage[self.highest_gain] if self.freedoms[node]]
         # if not nodes:
         #     self.highest_gain -= 1
@@ -39,7 +41,7 @@ class Block:
         for i in self.gains_storage.keys():
             if self.gains_storage[i]:
                 self.highest_gain = i
-                break
+                #break
 
     def remove_node(self, node):
         self.nodes.remove(node)

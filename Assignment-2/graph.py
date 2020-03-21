@@ -96,7 +96,7 @@ class Graph:
     def critical_network(self, base_cell):
         critical_network = []
         for network in self.nets:
-            if str(base_cell) in network and len(network) < 4:
+            if base_cell in network and len(network) < 4:
                 critical_network.append(network)
         return critical_network
 
@@ -132,7 +132,7 @@ class Graph:
         largest_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
         possible_nodes = largest_block.get_free_node_with_highest_gain()
         node_index = randint(0, (len(possible_nodes)-1))
-        node = list(possible_nodes)[node_index]
+        node = possible_nodes[node_index]
         # Remove node from current block and move it to the other one
         largest_block.remove_node(node)
         other_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
@@ -145,7 +145,7 @@ class Graph:
         # Select new node
         possible_nodes = other_block.get_free_node_with_highest_gain()
         node_index = randint(0, (len(possible_nodes)-1))
-        node = list(possible_nodes)[node_index]
+        node = possible_nodes[node_index]
         # Remove node from current block
         other_block.remove_node(node)
         # Move it to the other block and Set node to false
