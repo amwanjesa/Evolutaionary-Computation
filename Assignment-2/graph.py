@@ -1,5 +1,8 @@
-from random import shuffle, randint
+from random import shuffle, randint, seed
 from tqdm import tqdm
+from block import Block
+
+seed(42)
 
 
 class Node:
@@ -16,23 +19,21 @@ class Edge:
 
 
 class Graph:
-    def __init__(self, nodes=[], edges=[], connections=[]):
+    def __init__(self, nodes=[], degrees=[], connections=[]):
         self.nodes = nodes
-        self.edges = edges
+        self.degrees = degrees
         self.connections = connections
+        self.freedoms = {}
         self.block_a = None
         self.block_b = None
         self.current_solution = []
         self.current_cutstate = None
 
-    def add_node(self, id, degree):
-        new_node = Node(id, degree)
-        self.nodes.append(new_node)
+    def add_node(self, new_node_id, degree):
+        self.nodes.append(new_node_id)
+        self.degrees.append(degree)
+        self.freedoms[new_node_id] = True
 
-    def add_edge(self, source, target):
-        new_edge = Edge(source, target)
-        if not new_edge in self.edges:
-            self.edges.append(new_edge)
 
     def remove_node(self, node):
         self.nodes.remove(node)
@@ -42,46 +43,36 @@ class Graph:
 
     def init_partition(self):
         shuffle(self.nodes)
+        halfway = len(self.nodes) // 2
+        nodes_1 = self.nodes[:halfway]
+        nodes_2 = self.nodes[halfway:]
 
-        self.block_a = Block(self.nodes[:len(self.nodes) // 2], self.edges)
-        self.block_b = Block(self.nodes[len(self.nodes) // 2:], self.edges)
+        freedoms_1 = {k:v for k,v in self.freedoms.items() if k in nodes_1}
+        freedoms_2 = {k:v for k,v in self.freedoms.items() if k in nodes_2}
 
-    def contains_node(self, node):
-        return node in self.nodes
-
-    def contains_node_id(self, node_id):
-        return node_id in [node.id for node in self.nodes]
-
-    def contains_edge(self, edge):
-        return edge in self.edges
-
+        self.block_a = Block(
+            nodes=nodes_1, freedoms=freedoms_1, max_degree=max(self.degrees))
+        self.block_b = Block(
+            nodes=nodes_2, freedoms=freedoms_2, max_degree=max(self.degrees))
+    
     def setup_gains(self):
-        self.block_a.gain_storage = Gains(
-            max([node.degree for node in self.nodes]))
-        self.block_b.gain_storage = Gains(
-            max([node.degree for node in self.nodes]))
         for node in self.nodes:
             gain = self.calculate_gain(node)
             if self.block_a.contains_node(node):
-                self.block_a.gain_storage.save_node_at_gain(node, gain)
+                self.block_a.save_node_at_gain(node, gain)
             else:
-                self.block_b.gain_storage.save_node_at_gain(node, gain)
+                self.block_b.save_node_at_gain(node, gain)
 
     def calculate_gain(self, node):
         gain = 0
         node_block = self.block_a if self.block_a.contains_node(
             node) else self.block_b
-        for net in self.critical_network(node.id):
-            if all([node_block.contains_node_id(cell) for cell in net]):
+        for net in self.critical_network(node):
+            if all([node_block.contains_node(cell) for cell in net]):
                 gain += 1
             else:
                 gain -= 1
         return gain
-
-    def associated_edges(self, node):
-        for edge in self.edges:
-            if node.id in edge.pair:
-                yield edge
 
     def create_network(self):
         nets = []
@@ -92,11 +83,11 @@ class Graph:
                 # intersection of i and connections[j]
                 inters = list(set(i).intersection(
                     set(self.connections[int(j)-1])))
-                if len(inters) > 0:
-                    inters.extend([str(counter), j])
+                if inters:
+                    inters.extend([counter, j])
                     inters.sort()
                 else:
-                    inters.extend([str(counter), j])
+                    inters.extend([counter, j])
                     inters.sort()
                 if inters not in nets:
                     nets.append(inters)
@@ -108,16 +99,6 @@ class Graph:
             if str(base_cell) in network and len(network) < 4:
                 critical_network.append(network)
         return critical_network
-
-    def possible_nodes(self):
-        gains = []
-        possible_gains = []
-        for node in self.nodes:
-            gains.append([self.calculate_gain(node), node.id])
-        for gain in gains:
-            if gain[0] == max(gains)[0]:
-                possible_gains.append(gain)
-        print(possible_gains)
 
     def get_solution(self):
         solution = []
@@ -132,8 +113,8 @@ class Graph:
         cutstate = 0
         for node in self.block_a.nodes:
             for net in self.nets:
-                if node.id in net:
-                    if not all([self.block_a.contains_node_id(cell) for cell in net]):
+                if node in net:
+                    if not all([self.block_a.contains_node(cell) for cell in net]):
                         cutstate += 1
         return cutstate
 
@@ -149,28 +130,27 @@ class Graph:
 
     def bipartitioning(self):
         largest_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
-        possible_nodes = largest_block.gain_storage.get_free_node_with_highest_gain()
+        possible_nodes = largest_block.get_free_node_with_highest_gain()
         node_index = randint(0, (len(possible_nodes)-1))
         node = list(possible_nodes)[node_index]
         # Remove node from current block and move it to the other one
         largest_block.remove_node(node)
         other_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
-        other_block.nodes.append(node)
+
         # Mark moved node as not free
-        node.free = False
+        other_block.add_node(node, False)
         # Updated gains using self.setup_gains
         self.setup_gains()
 
         # Select new node
-        possible_nodes = other_block.gain_storage.get_free_node_with_highest_gain()
+        possible_nodes = other_block.get_free_node_with_highest_gain()
         node_index = randint(0, (len(possible_nodes)-1))
         node = list(possible_nodes)[node_index]
         # Remove node from current block
         other_block.remove_node(node)
-        # Move it to the other block
-        largest_block.nodes.append(node)
-        # Set node to false
-        node.free = False
+        # Move it to the other block and Set node to false
+        largest_block.add_node(node, False)
+        largest_block.lock_node(node)
         # Gains update
         self.setup_gains()
 
@@ -178,57 +158,9 @@ class Graph:
         self.update_solution()
 
     def fiduccia_mattheyses(self):
-        for i in tqdm(range(4), desc='Fiduccia Mattheyses iterations'):
-            if any(node.free for node in self.nodes):
+        for _ in tqdm(range(4), desc='Fiduccia Mattheyses iterations'):
+            if self.block_a.has_free_nodes() and self.block_b.has_free_nodes():
                 self.bipartitioning()
-            else: 
+            else:
                 break
         return {'solution': self.current_solution, 'cutstate': self.current_cutstate}
-
-
-class Block(Graph):
-    def __init__(self, nodes=[], edges=[]):
-        super().__init__(nodes=nodes, edges=edges)
-        self.gain_storage = None
-
-    @property
-    def size(self):
-        return len(self.nodes)
-
-    def remove_node(self, node):
-        self.nodes.remove(node)
-        self.gain_storage.remove_node(node)
-
-
-class Gains:
-    def __init__(self, max_degree):
-        self.max_degree = max_degree
-        self.records = {i: set() for i in range(-max_degree, max_degree + 1)}
-        self.highest_gain = 0
-
-    def get_nodes_at_gain(self, gain_value):
-        return self.records[gain_value]
-
-    def save_node_at_gain(self, node, gain_value):
-        self.records[gain_value].add(node)
-        self.update_highest_gain()
-
-    def get_free_node_with_highest_gain(self):
-        return [node for node in self.records[self.highest_gain] if node.free]
-        # if not nodes:
-        #     self.highest_gain -= 1
-        #     return self.get_free_node_with_highest_gain()
-        # else:
-        #     return nodes
-
-    def update_highest_gain(self):
-        for i in self.records.keys():
-            if self.records[i]:
-                self.highest_gain = i
-                break
-
-    def remove_node(self, node):
-        for gain, nodes in self.records.items():
-            if node in nodes:
-                self.records[gain].remove(node)
-                break
