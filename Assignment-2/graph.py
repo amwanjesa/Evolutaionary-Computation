@@ -179,7 +179,7 @@ class Graph:
 
     def fiduccia_mattheyses(self):
         for i in tqdm(range(4), desc='Fiduccia Mattheyses iterations'):
-            if any(node.free for node in self.block_a.nodes) and any(node.free for node in self.block_b.nodes):
+            if any(node.free for node in self.nodes):
                 self.bipartitioning()
             else: 
                 break
