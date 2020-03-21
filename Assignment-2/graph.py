@@ -1,4 +1,5 @@
 from random import shuffle, randint
+from tqdm import tqdm
 
 
 class Node:
@@ -21,7 +22,7 @@ class Graph:
         self.connections = connections
         self.block_a = None
         self.block_b = None
-        self.initial_solution = []
+        self.current_solution = []
         self.current_cutstate = None
 
     def add_node(self, id, degree):
@@ -32,7 +33,7 @@ class Graph:
         new_edge = Edge(source, target)
         if not new_edge in self.edges:
             self.edges.append(new_edge)
-        
+
     def remove_node(self, node):
         self.nodes.remove(node)
 
@@ -43,7 +44,7 @@ class Graph:
         shuffle(self.nodes)
 
         self.block_a = Block(self.nodes[:len(self.nodes) // 2], self.edges)
-        self.block_b = Block(self.nodes[len(self.nodes) // 2 :], self.edges)
+        self.block_b = Block(self.nodes[len(self.nodes) // 2:], self.edges)
 
     def contains_node(self, node):
         return node in self.nodes
@@ -55,8 +56,10 @@ class Graph:
         return edge in self.edges
 
     def setup_gains(self):
-        self.block_a.gain_storage = Gains(max([node.degree for node in self.nodes]))
-        self.block_b.gain_storage = Gains(max([node.degree for node in self.nodes]))
+        self.block_a.gain_storage = Gains(
+            max([node.degree for node in self.nodes]))
+        self.block_b.gain_storage = Gains(
+            max([node.degree for node in self.nodes]))
         for node in self.nodes:
             gain = self.calculate_gain(node)
             if self.block_a.contains_node(node):
@@ -138,15 +141,15 @@ class Graph:
         new_cutstate = self.get_cutstate()
         if self.current_cutstate is not None:
             if new_cutstate < self.current_cutstate:
-                self.initial_solution = self.get_solution()
+                self.current_solution = self.get_solution()
                 self.current_cutstate = new_cutstate
         else:
-            self.initial_solution = self.get_solution()
+            self.current_solution = self.get_solution()
             self.current_cutstate = new_cutstate
-   
+
     def bipartitioning(self):
         largest_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
-        possible_nodes = largest_block.gain_storage.get_node_with_highest_gain()
+        possible_nodes = largest_block.gain_storage.get_free_node_with_highest_gain()
         node_index = randint(0, (len(possible_nodes)-1))
         node = list(possible_nodes)[node_index]
         # Remove node from current block and move it to the other one
@@ -159,7 +162,7 @@ class Graph:
         self.setup_gains()
 
         # Select new node
-        possible_nodes = other_block.gain_storage.get_node_with_highest_gain()
+        possible_nodes = other_block.gain_storage.get_free_node_with_highest_gain()
         node_index = randint(0, (len(possible_nodes)-1))
         node = list(possible_nodes)[node_index]
         # Remove node from current block
@@ -173,6 +176,11 @@ class Graph:
 
         # Calculate new solution
         self.update_solution()
+
+    def fiduccia_mattheyses(self):
+        for i in tqdm(range(4), desc='Fiduccia Mattheyses iterations'):
+            self.bipartitioning()
+        return {'solution': self.current_solution, 'cutstate': self.current_cutstate}
 
 
 class Block(Graph):
@@ -202,15 +210,20 @@ class Gains:
         self.records[gain_value].add(node)
         self.update_highest_gain()
 
-    def get_node_with_highest_gain(self):
-        return self.records[self.highest_gain]
+    def get_free_node_with_highest_gain(self):
+        return [node for node in self.records[self.highest_gain] if node.free]
+        # if not nodes:
+        #     self.highest_gain -= 1
+        #     return self.get_free_node_with_highest_gain()
+        # else:
+        #     return nodes
 
     def update_highest_gain(self):
         for i in self.records.keys():
             if self.records[i]:
                 self.highest_gain = i
                 break
-    
+
     def remove_node(self, node):
         for gain, nodes in self.records.items():
             if node in nodes:

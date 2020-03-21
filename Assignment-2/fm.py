@@ -1,6 +1,10 @@
-from graph import *
-import pandas as pd
 import pprint
+
+import pandas as pd
+from tqdm import tqdm
+
+from graph import *
+
 
 def read_graph_data(filename):
     connections = []
@@ -18,9 +22,14 @@ def read_graph_data(filename):
 
 
 if __name__ == '__main__':
-    graph = read_graph_data('Graph500.txt')
-    graph.create_network()
-    graph.init_partition()
-    graph.setup_gains()
-    #import pdb; pdb.set_trace()
-    graph.bipartitioning()
+    
+    fm_solutions = pd.DataFrame()
+    for i in tqdm(range(10000), desc='Fiducca Mattheyses experiments'):
+        graph = read_graph_data('Graph500.txt')
+        graph.create_network()
+        graph.init_partition()
+        graph.setup_gains()
+        result = graph.fiduccia_mattheyses()
+        fm_solutions = fm_solutions.append(result, ignore_index=True)
+        del graph
+    fm_solutions.to_csv('fm_result.csv')
