@@ -1,5 +1,5 @@
 import pprint
-
+from collections import Counter
 import pandas as pd
 from tqdm import tqdm
 
@@ -22,13 +22,13 @@ def read_graph_data(filename):
 if __name__ == '__main__':
     
     fm_solutions = pd.DataFrame()
+    graph = read_graph_data('Graph500.txt')
     for i in tqdm(range(10000), desc='Fiducca Mattheyses experiments'):
-        graph = read_graph_data('Graph500.txt')
         graph.create_network()
         graph.init_partition()
         graph.setup_gains()
         result = graph.fiduccia_mattheyses()
         fm_solutions = fm_solutions.append(result, ignore_index=True)
         print(fm_solutions)
-        del graph
+        #del graph
     fm_solutions.to_csv('fm_result.csv')

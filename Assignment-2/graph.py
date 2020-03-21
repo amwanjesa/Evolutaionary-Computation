@@ -136,12 +136,11 @@ class Graph:
         # Remove node from current block and move it to the other one
         largest_block.remove_node(node)
         other_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
-
         # Mark moved node as not free
         other_block.add_node(node, False)
+        other_block.lock_node(node)
         # Updated gains using self.setup_gains
         self.setup_gains()
-
         # Select new node
         possible_nodes = other_block.get_free_node_with_highest_gain()
         node_index = randint(0, (len(possible_nodes)-1))
@@ -153,7 +152,6 @@ class Graph:
         largest_block.lock_node(node)
         # Gains update
         self.setup_gains()
-
         # Calculate new solution
         self.update_solution()
 
