@@ -1,4 +1,4 @@
-from random import shuffle
+from random import shuffle, randint
 
 
 class Node:
@@ -43,7 +43,7 @@ class Graph:
         shuffle(self.nodes)
 
         self.block_a = Block(self.nodes[:len(self.nodes) // 2], self.edges)
-        self.block_b = Block(self.nodes[:len(self.nodes) // 2], self.edges)
+        self.block_b = Block(self.nodes[len(self.nodes) // 2 :], self.edges)
 
     def contains_node(self, node):
         return node in self.nodes
@@ -143,8 +143,9 @@ class Graph:
    
     def bipartitioning(self):
         largest_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
-        node = largest_block.gain_storage.get_node_with_highest_gain()
-
+        possible_nodes = largest_block.gain_storage.get_node_with_highest_gain()
+        node_index = randint(0, (len(possible_nodes)-1))
+        node = list(possible_nodes)[node_index]
         # Remove node from current block and move it to the other one
         largest_block.remove_node(node)
         other_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
@@ -155,7 +156,9 @@ class Graph:
         self.setup_gains()
 
         # Select new node
-        node = other_block.gain_storage.get_node_with_highest_gain()
+        possible_nodes = other_block.gain_storage.get_node_with_highest_gain()
+        node_index = randint(0, (len(possible_nodes)-1))
+        node = list(possible_nodes)[node_index]
         # Remove node from current block
         other_block.remove_node(node)
         # Move it to the other block
