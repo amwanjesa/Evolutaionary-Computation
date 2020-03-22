@@ -114,7 +114,7 @@ class Graph:
         cutstate = 0
         for node in self.block_a.nodes:
             for net in self.nets:
-                if node in net:
+                if node in net and len(net) < 4:
                     if not all([self.block_a.contains_node(cell) for cell in net]):
                         cutstate += 1
         return cutstate
