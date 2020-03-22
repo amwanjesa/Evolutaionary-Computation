@@ -1,5 +1,8 @@
+import logging
 import pprint
+import traceback
 from collections import Counter
+
 import pandas as pd
 from tqdm import tqdm
 
@@ -20,7 +23,7 @@ def read_graph_data(filename):
 
 
 if __name__ == '__main__':
-    
+
     fm_solutions = pd.DataFrame()
     graph = read_graph_data('Graph500.txt')
     for i in tqdm(range(10000), desc='Fiducca Mattheyses experiments'):
@@ -29,6 +32,4 @@ if __name__ == '__main__':
         graph.setup_gains()
         result = graph.fiduccia_mattheyses()
         fm_solutions = fm_solutions.append(result, ignore_index=True)
-        print(fm_solutions)
-        #del graph
     fm_solutions.to_csv('fm_result.csv')

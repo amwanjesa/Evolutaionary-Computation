@@ -24,12 +24,12 @@ class Block:
         self.update_highest_gain()
 
     def get_free_node_with_highest_gain(self):
-        return [node for node in self.gains_storage[self.highest_gain] if self.freedoms[node]]
-        # if not nodes:
-        #     self.highest_gain -= 1
-        #     return self.get_free_node_with_highest_gain()
-        # else:
-        #     return nodes
+        nodes = [node for node in self.gains_storage[self.highest_gain] if self.freedoms[node]]
+        if not nodes:
+            self.highest_gain -= 1
+            return self.get_free_node_with_highest_gain()
+        else:
+            return nodes
 
 
     def lock_node(self, node):
@@ -47,6 +47,7 @@ class Block:
         for gain, nodes in self.gains_storage.items():
             if node in nodes:
                 self.gains_storage[gain].remove(node)
+        self.update_highest_gain()
                 #break
         
 

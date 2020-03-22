@@ -57,10 +57,11 @@ class Graph:
     
     def setup_gains(self):
         for node in self.nodes:
-            gain = self.calculate_gain(node)
             if self.block_a.contains_node(node):
+                gain = self.calculate_gain(node)
                 self.block_a.save_node_at_gain(node, gain)
-            else:
+            elif self.block_b.contains_node(node):
+                gain = self.calculate_gain(node)
                 self.block_b.save_node_at_gain(node, gain)
 
     def calculate_gain(self, node):
