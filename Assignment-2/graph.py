@@ -14,12 +14,12 @@ class Node:
 
 
 class Edge:
-    def __init__(self, source, target):
-        self.pair = set([source, target])
+    def __init__(self, endpoint_1, endpoint_2):
+        self.pair = set([endpoint_1, endpoint_2])
 
 
 class Graph:
-    def __init__(self, nodes=[], degrees=[], connections=[]):
+    def __init__(self, nodes=[], degrees=[], connections={}):
         self.nodes = nodes
         self.degrees = degrees
         self.connections = connections
@@ -38,8 +38,8 @@ class Graph:
     def remove_node(self, node):
         self.nodes.remove(node)
 
-    def add_connection(self, connections):
-        self.connections.append(connections)
+    def add_connection(self, node, connections):
+        self.connections[node] = connections
 
     def init_partition(self):
         shuffle(self.nodes)
@@ -66,40 +66,23 @@ class Graph:
 
     def calculate_gain(self, node):
         gain = 0
+
+        #!!! This might be wrong
         node_block = self.block_a if self.block_a.contains_node(
             node) else self.block_b
-        for net in self.critical_network(node):
-            if all([node_block.contains_node(cell) for cell in net]):
-                gain += 1
-            else:
+        for neighbour in self.connections[node]:
+            if node_block.contains_node(neighbour):
                 gain -= 1
+            else:
+                gain += 1
         return gain
 
-    def create_network(self):
-        nets = []
-        counter = 0
-        for i in self.connections:
-            counter += 1
-            for j in i:
-                # intersection of i and connections[j]
-                inters = list(set(i).intersection(
-                    set(self.connections[int(j)-1])))
-                if inters:
-                    inters.extend([counter, j])
-                    inters.sort()
-                else:
-                    inters.extend([counter, j])
-                    inters.sort()
-                if inters not in nets:
-                    nets.append(inters)
-        self.nets = nets
-
-    def critical_network(self, base_cell):
-        critical_network = []
-        for network in self.nets:
-            if base_cell in network and len(network) < 4:
-                critical_network.append(network)
-        return critical_network
+    # def critical_network(self, base_cell):
+    #     critical_network = []
+    #     for network in self.nets:
+    #         if base_cell in network and len(network) < 4:
+    #             critical_network.append(network)
+    #     return critical_network
 
     def get_solution(self):
         solution = []
@@ -112,11 +95,16 @@ class Graph:
 
     def get_cutstate(self):
         cutstate = 0
-        for node in self.block_a.nodes:
-            for net in self.nets:
-                if node in net and len(net) < 4:
-                    if not all([self.block_a.contains_node(cell) for cell in net]):
-                        cutstate += 1
+        seen = []
+        for node in self.nodes:
+            connections = self.connections[node]
+            for neighbour in connections:
+                if frozenset((node, neighbour)) in seen:
+                    continue
+                node_block = self.block_a if self.block_a.contains_node(node) else self.block_b
+                if not all([node_block.contains_node(cell) for cell in (node, neighbour)]):
+                    cutstate += 1
+                seen.append(frozenset((node, neighbour)))
         return cutstate
 
     def update_solution(self):
@@ -157,7 +145,7 @@ class Graph:
         self.update_solution()
 
     def fiduccia_mattheyses(self):
-        for _ in tqdm(range(4), desc='Fiduccia Mattheyses iterations'):
+        for _ in tqdm(range(40), desc='Fiduccia Mattheyses iterations'):
             if self.block_a.has_free_nodes() and self.block_b.has_free_nodes():
                 self.bipartitioning()
             else:
