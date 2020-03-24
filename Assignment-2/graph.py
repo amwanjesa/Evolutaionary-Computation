@@ -45,8 +45,12 @@ class Graph:
         count_b_block = 0
         if previous_solution:
             print("DOING PREVIOUS SOLUTION!")
-            self.block_a = Block(max_degree=max(self.degrees))
-            self.block_b = Block(max_degree=max(self.degrees))
+            nodes_1 = []
+            nodes_2 = []
+            freedoms_1 = {}
+            freedoms_2 = {}
+            #self.block_a = Block(max_degree=max(self.degrees))
+            #self.block_b = Block(max_degree=max(self.degrees))
             count = 0
             for i, (node, in_a) in enumerate(previous_solution.items()):
                 # print(node)
@@ -54,12 +58,19 @@ class Graph:
                     # print(f'BLock A size: {self.block_a.size} in iteration {i + 1}')
                     # if self.block_a.size >= 249:
                     #     import pdb; pdb.set_trace()
-                    self.block_a.add_node(node, True)
+                    nodes_1.append(node)
+                    freedoms_1[node] = True
+                    #self.block_a.add_node(node, True)
                 else:
                     # print(f'Block B size: {self.block_b.size} in iteration {i + 1}')
                     count_b_block += 1
-                    self.block_b.add_node(node, True)
-
+                    nodes_2.append(node)
+                    freedoms_2[node] = True
+                    #self.block_b.add_node(node, True)
+            self.block_a = Block(
+                nodes=nodes_1, freedoms=freedoms_1, max_degree=max(self.degrees))
+            self.block_b = Block(
+                nodes=nodes_2, freedoms=freedoms_2, max_degree=max(self.degrees))
             # print(f'For loop iterations in B block: {count_b_block}')   
         else:
             shuffle(self.nodes)

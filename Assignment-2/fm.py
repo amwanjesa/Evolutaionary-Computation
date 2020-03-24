@@ -31,8 +31,8 @@ if __name__ == '__main__':
 
     fm_solutions = pd.DataFrame()
     previous_solution = {}
-    nodes, connections, degrees, freedoms = read_graph_data('Assignment-2\Graph500.txt')
-
+    nodes, connections, degrees, freedoms = read_graph_data('Graph500.txt')
+    
     for i in tqdm(range(2500), desc='Fiducca Mattheyses experiments'):
         graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)
         if previous_solution:
@@ -42,9 +42,9 @@ if __name__ == '__main__':
         graph.setup_gains()
         result = graph.fiduccia_mattheyses()
         previous_solution = result['solution']
-        print(previous_solution)
+        #print(previous_solution)
         fm_solutions = fm_solutions.append(result, ignore_index=True)
-        graph.reset()
-        del graph
+        #graph.reset()
+        #del graph
         if i == 50:
             fm_solutions.to_csv('fm_result_no_nets_50.csv')
