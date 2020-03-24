@@ -19,11 +19,11 @@ class Edge:
 
 
 class Graph:
-    def __init__(self, nodes=[], degrees=[], connections={}):
+    def __init__(self, nodes=[], degrees=[], connections={}, freedoms={}):
         self.nodes = nodes
         self.degrees = degrees
         self.connections = connections
-        self.freedoms = {}
+        self.freedoms = freedoms
         self.block_a = None
         self.block_b = None
         self.current_solution = []
@@ -41,20 +41,40 @@ class Graph:
     def add_connection(self, node, connections):
         self.connections[node] = connections
 
-    def init_partition(self):
-        shuffle(self.nodes)
-        halfway = len(self.nodes) // 2
-        nodes_1 = self.nodes[:halfway]
-        nodes_2 = self.nodes[halfway:]
+    def init_partition(self, previous_solution={}):
+        count_b_block = 0
+        if previous_solution:
+            print("DOING PREVIOUS SOLUTION!")
+            self.block_a = Block(max_degree=max(self.degrees))
+            self.block_b = Block(max_degree=max(self.degrees))
+            count = 0
+            for i, (node, in_a) in enumerate(previous_solution.items()):
+                # print(node)
+                if in_a:
+                    # print(f'BLock A size: {self.block_a.size} in iteration {i + 1}')
+                    # if self.block_a.size >= 249:
+                    #     import pdb; pdb.set_trace()
+                    self.block_a.add_node(node, True)
+                else:
+                    # print(f'Block B size: {self.block_b.size} in iteration {i + 1}')
+                    count_b_block += 1
+                    self.block_b.add_node(node, True)
 
-        freedoms_1 = {k:v for k,v in self.freedoms.items() if k in nodes_1}
-        freedoms_2 = {k:v for k,v in self.freedoms.items() if k in nodes_2}
+            # print(f'For loop iterations in B block: {count_b_block}')   
+        else:
+            shuffle(self.nodes)
+            halfway = len(self.nodes) // 2
+            nodes_1 = self.nodes[:halfway]
+            nodes_2 = self.nodes[halfway:]
 
-        self.block_a = Block(
-            nodes=nodes_1, freedoms=freedoms_1, max_degree=max(self.degrees))
-        self.block_b = Block(
-            nodes=nodes_2, freedoms=freedoms_2, max_degree=max(self.degrees))
-    
+            freedoms_1 = {k:v for k,v in self.freedoms.items() if k in nodes_1}
+            freedoms_2 = {k:v for k,v in self.freedoms.items() if k in nodes_2}
+
+            self.block_a = Block(
+                nodes=nodes_1, freedoms=freedoms_1, max_degree=max(self.degrees))
+            self.block_b = Block(
+                nodes=nodes_2, freedoms=freedoms_2, max_degree=max(self.degrees))
+
     def setup_gains(self):
         for node in self.nodes:
             if self.block_a.contains_node(node):
@@ -85,12 +105,13 @@ class Graph:
     #     return critical_network
 
     def get_solution(self):
-        solution = []
+        solution = {}
         for node in self.nodes:
+            # print(f'Checking order: {node}')
             if self.block_a.contains_node(node):
-                solution.append(1)
+                solution[node]= 1
             else:
-                solution.append(0)
+                solution[node]= 0
         return solution
 
     def get_cutstate(self):
@@ -145,9 +166,16 @@ class Graph:
         self.update_solution()
 
     def fiduccia_mattheyses(self):
-        for _ in tqdm(range(40), desc='Fiduccia Mattheyses iterations'):
+        for _ in range(4):
             if self.block_a.has_free_nodes() and self.block_b.has_free_nodes():
                 self.bipartitioning()
             else:
                 break
         return {'solution': self.current_solution, 'cutstate': self.current_cutstate}
+
+    def reset(self):
+        del self.block_a, self.block_b, self.current_cutstate, self.current_solution
+        self.block_a = None
+        self.block_b = None
+        self.current_solution = []
+        self.current_cutstate = 0
