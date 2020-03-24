@@ -2,7 +2,6 @@ class Block:
     def __init__(self, nodes=[], freedoms={}, max_degree=0):
         self.nodes = nodes
         self.freedoms = freedoms
-        self.gain_storage = None
         self.max_degree = max_degree
         self.gains_storage = {i: set()
                               for i in range(-max_degree, max_degree + 1)}
@@ -39,7 +38,6 @@ class Block:
         for i in self.gains_storage.keys():
             if self.gains_storage[i]:
                 self.highest_gain = i
-                #break
 
     def remove_node(self, node):
         self.nodes.remove(node)
@@ -48,7 +46,6 @@ class Block:
             if node in nodes:
                 self.gains_storage[gain].remove(node)
         self.update_highest_gain()
-                #break
         
 
     def contains_node(self, node):

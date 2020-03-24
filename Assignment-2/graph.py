@@ -19,11 +19,11 @@ class Edge:
 
 
 class Graph:
-    def __init__(self, nodes=[], degrees=[], connections={}):
+    def __init__(self, nodes=[], degrees=[], connections={}, freedoms={}):
         self.nodes = nodes
         self.degrees = degrees
         self.connections = connections
-        self.freedoms = {}
+        self.freedoms = freedoms
         self.block_a = None
         self.block_b = None
         self.current_solution = []
@@ -41,20 +41,40 @@ class Graph:
     def add_connection(self, node, connections):
         self.connections[node] = connections
 
-    def init_partition(self):
-        shuffle(self.nodes)
-        halfway = len(self.nodes) // 2
-        nodes_1 = self.nodes[:halfway]
-        nodes_2 = self.nodes[halfway:]
+    def init_partition(self, previous_solution={}):
+        count_b_block = 0
+        if previous_solution:
+            nodes_1 = []
+            nodes_2 = []
+            freedoms_1 = {}
+            freedoms_2 = {}
+            count = 0
+            for i, (node, in_a) in enumerate(previous_solution.items()):
+                if in_a:
+                    nodes_1.append(node)
+                    freedoms_1[node] = True
+                else:
+                    count_b_block += 1
+                    nodes_2.append(node)
+                    freedoms_2[node] = True
+            self.block_a = Block(
+                nodes=nodes_1, freedoms=freedoms_1, max_degree=max(self.degrees))
+            self.block_b = Block(
+                nodes=nodes_2, freedoms=freedoms_2, max_degree=max(self.degrees))
+        else:
+            shuffle(self.nodes)
+            halfway = len(self.nodes) // 2
+            nodes_1 = self.nodes[:halfway]
+            nodes_2 = self.nodes[halfway:]
 
-        freedoms_1 = {k:v for k,v in self.freedoms.items() if k in nodes_1}
-        freedoms_2 = {k:v for k,v in self.freedoms.items() if k in nodes_2}
+            freedoms_1 = {k:v for k,v in self.freedoms.items() if k in nodes_1}
+            freedoms_2 = {k:v for k,v in self.freedoms.items() if k in nodes_2}
 
-        self.block_a = Block(
-            nodes=nodes_1, freedoms=freedoms_1, max_degree=max(self.degrees))
-        self.block_b = Block(
-            nodes=nodes_2, freedoms=freedoms_2, max_degree=max(self.degrees))
-    
+            self.block_a = Block(
+                nodes=nodes_1, freedoms=freedoms_1, max_degree=max(self.degrees))
+            self.block_b = Block(
+                nodes=nodes_2, freedoms=freedoms_2, max_degree=max(self.degrees))
+
     def setup_gains(self):
         for node in self.nodes:
             if self.block_a.contains_node(node):
@@ -77,20 +97,13 @@ class Graph:
                 gain += 1
         return gain
 
-    # def critical_network(self, base_cell):
-    #     critical_network = []
-    #     for network in self.nets:
-    #         if base_cell in network and len(network) < 4:
-    #             critical_network.append(network)
-    #     return critical_network
-
     def get_solution(self):
-        solution = []
+        solution = {}
         for node in self.nodes:
             if self.block_a.contains_node(node):
-                solution.append(1)
+                solution[node]= 1
             else:
-                solution.append(0)
+                solution[node]= 0
         return solution
 
     def get_cutstate(self):
@@ -122,30 +135,38 @@ class Graph:
         possible_nodes = largest_block.get_free_node_with_highest_gain()
         node_index = randint(0, (len(possible_nodes)-1))
         node = possible_nodes[node_index]
+
         # Remove node from current block and move it to the other one
         largest_block.remove_node(node)
         other_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
+
         # Mark moved node as not free
         other_block.add_node(node, False)
         other_block.lock_node(node)
+
         # Updated gains using self.setup_gains
         self.setup_gains()
+
         # Select new node
         possible_nodes = other_block.get_free_node_with_highest_gain()
         node_index = randint(0, (len(possible_nodes)-1))
         node = possible_nodes[node_index]
+
         # Remove node from current block
         other_block.remove_node(node)
+
         # Move it to the other block and Set node to false
         largest_block.add_node(node, False)
         largest_block.lock_node(node)
+
         # Gains update
         self.setup_gains()
+
         # Calculate new solution
         self.update_solution()
 
     def fiduccia_mattheyses(self):
-        for _ in tqdm(range(40), desc='Fiduccia Mattheyses iterations'):
+        for _ in range(4):
             if self.block_a.has_free_nodes() and self.block_b.has_free_nodes():
                 self.bipartitioning()
             else:
