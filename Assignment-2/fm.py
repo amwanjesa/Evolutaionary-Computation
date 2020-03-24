@@ -44,7 +44,7 @@ if __name__ == '__main__':
         previous_solution = result['solution']
         #print(previous_solution)
         fm_solutions = fm_solutions.append(result, ignore_index=True)
-        #graph.reset()
-        #del graph
+        graph.reset()
+        del graph
         if i == 50:
             fm_solutions.to_csv('fm_result_no_nets_50.csv')
