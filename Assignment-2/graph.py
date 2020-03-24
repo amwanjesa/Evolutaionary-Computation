@@ -44,34 +44,23 @@ class Graph:
     def init_partition(self, previous_solution={}):
         count_b_block = 0
         if previous_solution:
-            print("DOING PREVIOUS SOLUTION!")
             nodes_1 = []
             nodes_2 = []
             freedoms_1 = {}
             freedoms_2 = {}
-            #self.block_a = Block(max_degree=max(self.degrees))
-            #self.block_b = Block(max_degree=max(self.degrees))
             count = 0
             for i, (node, in_a) in enumerate(previous_solution.items()):
-                # print(node)
                 if in_a:
-                    # print(f'BLock A size: {self.block_a.size} in iteration {i + 1}')
-                    # if self.block_a.size >= 249:
-                    #     import pdb; pdb.set_trace()
                     nodes_1.append(node)
                     freedoms_1[node] = True
-                    #self.block_a.add_node(node, True)
                 else:
-                    # print(f'Block B size: {self.block_b.size} in iteration {i + 1}')
                     count_b_block += 1
                     nodes_2.append(node)
                     freedoms_2[node] = True
-                    #self.block_b.add_node(node, True)
             self.block_a = Block(
                 nodes=nodes_1, freedoms=freedoms_1, max_degree=max(self.degrees))
             self.block_b = Block(
                 nodes=nodes_2, freedoms=freedoms_2, max_degree=max(self.degrees))
-            # print(f'For loop iterations in B block: {count_b_block}')   
         else:
             shuffle(self.nodes)
             halfway = len(self.nodes) // 2
@@ -108,17 +97,9 @@ class Graph:
                 gain += 1
         return gain
 
-    # def critical_network(self, base_cell):
-    #     critical_network = []
-    #     for network in self.nets:
-    #         if base_cell in network and len(network) < 4:
-    #             critical_network.append(network)
-    #     return critical_network
-
     def get_solution(self):
         solution = {}
         for node in self.nodes:
-            # print(f'Checking order: {node}')
             if self.block_a.contains_node(node):
                 solution[node]= 1
             else:
@@ -154,25 +135,33 @@ class Graph:
         possible_nodes = largest_block.get_free_node_with_highest_gain()
         node_index = randint(0, (len(possible_nodes)-1))
         node = possible_nodes[node_index]
+
         # Remove node from current block and move it to the other one
         largest_block.remove_node(node)
         other_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
+
         # Mark moved node as not free
         other_block.add_node(node, False)
         other_block.lock_node(node)
+
         # Updated gains using self.setup_gains
         self.setup_gains()
+
         # Select new node
         possible_nodes = other_block.get_free_node_with_highest_gain()
         node_index = randint(0, (len(possible_nodes)-1))
         node = possible_nodes[node_index]
+
         # Remove node from current block
         other_block.remove_node(node)
+
         # Move it to the other block and Set node to false
         largest_block.add_node(node, False)
         largest_block.lock_node(node)
+
         # Gains update
         self.setup_gains()
+
         # Calculate new solution
         self.update_solution()
 
@@ -183,10 +172,3 @@ class Graph:
             else:
                 break
         return {'solution': self.current_solution, 'cutstate': self.current_cutstate}
-
-    def reset(self):
-        del self.block_a, self.block_b, self.current_cutstate, self.current_solution
-        self.block_a = None
-        self.block_b = None
-        self.current_solution = []
-        self.current_cutstate = 0
