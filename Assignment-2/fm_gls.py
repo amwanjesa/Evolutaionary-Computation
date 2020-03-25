@@ -58,9 +58,9 @@ if __name__ == '__main__':
         result = graph.fiduccia_mattheyses()
         child_cutstate, new_child = transform_results(result)
         print(f'Child: {child_cutstate}')
-        gls.create_new_population(500, new_child, child_cutstate, ranked_population)
         cc_test = graph.population_cutstate(new_child)
         print(f'Test: {cc_test}')
+        gls.create_new_population(500, new_child, child_cutstate, ranked_population)
         # Get new ranked population
         ranked_population = {}
         for person in gls.population:

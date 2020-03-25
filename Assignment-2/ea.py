@@ -39,7 +39,11 @@ class GLS:
             else:
                 child.append(random.randint(0,1))
                 index_free_bits.append(i)
-        return self.check_equality(length, index_free_bits, child)
+        
+        if self.parents[1] == new_parent:
+            return child
+        else:
+            return self.check_equality(length, index_free_bits, child)
 
     def check_equality(self, length, possible_indeces, individual):
         if sum(individual) != (length/2):
