@@ -19,13 +19,15 @@ def read_graph_data(filename):
         for line in f:
             l = line.split()
             if len(l) > 0:
-                node, degree, neighbours = int(l[0]), int(l[2]), [int(x) for x in l[3:]]
+                node, degree, neighbours = int(l[0]), int(l[2]), [
+                    int(x) for x in l[3:]]
                 connections[node] = neighbours
                 freedoms[node] = True
                 nodes.append(node)
                 degrees[node] = degree
 
-    return  nodes, connections, degrees, freedoms
+    return nodes, connections, degrees, freedoms
+
 
 def transform_results(results_dict):
     new_child = []
@@ -35,7 +37,8 @@ def transform_results(results_dict):
         new_child.append(solution_dict[i])
     return cutstate, new_child
 
-if __name__ == '__main__':
+def transform_person(person):
+        return {i+1 : person[i] for i in range(len(person))}
 
     fm_solutions = pd.DataFrame(columns = ['Cutstate', 'Solution'])
     previous_solution = {}
@@ -43,13 +46,25 @@ if __name__ == '__main__':
     graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)
     gls = GLS(population_size = 50)
     ranked_population = {}
-    for person in gls.population:
-        new_person = gls.transform_person(person)
+    for person in population:
+        new_person = transform_person(person)
         cutstate = graph.population_cutstate(new_person)
         if cutstate in ranked_population:
             ranked_population[cutstate].append(person)
         else:
             ranked_population[cutstate] = [person]
+    return ranked_population
+
+
+if __name__ == '__main__':
+
+    fm_solutions = pd.DataFrame()
+    previous_solution = {}
+    nodes, connections, degrees, freedoms = read_graph_data('Graph500.txt')
+    graph = Graph(nodes=nodes, connections=connections,
+                  freedoms=freedoms, degrees=degrees)
+    gls = GLS(population_size=50)
+    ranked_population = rank_population(gls, graph)
 
     for i in tqdm(range(2500), desc='Fiducca Mattheyses experiments'):
         child = gls.crossover()
