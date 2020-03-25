@@ -37,7 +37,7 @@ def transform_results(results_dict):
 
 if __name__ == '__main__':
 
-    fm_solutions = pd.DataFrame()
+    fm_solutions = pd.DataFrame(columns = ['Cutstate', 'Solution'])
     previous_solution = {}
     nodes, connections, degrees, freedoms = read_graph_data('Graph500.txt')
     graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)
@@ -57,11 +57,13 @@ if __name__ == '__main__':
         graph.setup_gains()
         result = graph.fiduccia_mattheyses()
         child_cutstate, new_child = transform_results(result)
-        new_population = gls.create_new_population(500, new_child, child_cutstate, ranked_population)
-        
+        print(f'Child: {child_cutstate}')
+        gls.create_new_population(500, new_child, child_cutstate, ranked_population)
+        cc_test = graph.population_cutstate(new_child)
+        print(f'Test: {cc_test}')
         # Get new ranked population
         ranked_population = {}
-        for person in new_population:
+        for person in gls.population:
             transformed_person = gls.transform_person(person)
             cutstate = graph.population_cutstate(transformed_person)
             if cutstate in ranked_population:
@@ -69,8 +71,12 @@ if __name__ == '__main__':
             else:
                 ranked_population[cutstate] = [person]
 
-        fm_solutions = fm_solutions.append(ranked_population, ignore_index=True)
+        best_cutstate = min(ranked_population.keys())
+        print(f'Cutstates {sorted(ranked_population.keys())}')
+        best_solution = ranked_population[best_cutstate]
+
+        fm_solutions = fm_solutions.append({'Cutstate': best_cutstate, 'Solution': best_solution}, ignore_index=True)
         #del graph
-        if i == 50:
-            fm_solutions.to_csv('fm_result_gls_200.csv')
+        #if i == 50:
+        #    fm_solutions.to_csv('fm_result_gls_200.csv')
     fm_solutions.to_csv('gls_with_fm.csv')

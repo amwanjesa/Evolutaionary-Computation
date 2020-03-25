@@ -57,18 +57,21 @@ class GLS:
         # Get worse individual
         worst_cutstate = max(ranked_population.keys())
         contestant = ranked_population[worst_cutstate]
-        if len(ranked_population[worst_cutstate]) != 1:
-            contestant = contestant[random.randint(0, (len(ranked_population)-1))]
+        if len(ranked_population[worst_cutstate]) > 1:
+            contestant = contestant[random.randint(0, (len(ranked_population[worst_cutstate])-1))]
+        if len(ranked_population[worst_cutstate]) == 1:
+            contestant = contestant[0]
         # Make it compete with the child
-        if child_cutstate >= worst_cutstate:
-            for i in len(self.population):
+        if child_cutstate <= worst_cutstate:
+            for i in range(len(self.population)):
                 if self.population[i] != contestant:
                     new_population.append(self.population[i])
-                else:
+                if self.population[i] == contestant:
                     new_population.append(new_child)
         else:
             new_population = self.population
-        return new_population
+
+        self.population = new_population
 
     def transform_person(self, person):
         new_person = {}
