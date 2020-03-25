@@ -1,6 +1,7 @@
 from random import shuffle, randint, seed
 from tqdm import tqdm
 from block import Block
+from operator import itemgetter
 
 seed(42)
 
@@ -116,6 +117,19 @@ class Graph:
                     continue
                 node_block = self.block_a if self.block_a.contains_node(node) else self.block_b
                 if not all([node_block.contains_node(cell) for cell in (node, neighbour)]):
+                    cutstate += 1
+                seen.append(frozenset((node, neighbour)))
+        return cutstate
+
+    def population_cutstate(self, person):
+        cutstate = 0
+        seen = []
+        for node in self.nodes:
+            connections = self.connections[node]
+            for neighbour in connections:
+                if frozenset((node, neighbour)) in seen:
+                    continue
+                if person[node-1] != person[neighbour-1]:
                     cutstate += 1
                 seen.append(frozenset((node, neighbour)))
         return cutstate

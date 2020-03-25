@@ -5,21 +5,26 @@ from graph import *
 
 random.seed(673)
 
+
 class GLS:
     def __init__(self, population_size):
         self.population = self.generate_population(length=500, size=population_size)
 
     def generate_population(self, length=500, size=50):
         def get_binary_string(length):
+            person = []
             for i in range(length):
-                person = [].append(random.randint(0,1))
-            return check_equality(length, (length-1), person)
+                person.append(random.randint(0,1))
+            return self.check_equality(length, list(range(length)), person)
         return [get_binary_string(length) for i in range(size)]
 
     def crossover(self, length=500):
         # Uniform crossover
         child = []
         index_free_bits = []
+        random.shuffle(self.population)
+        index = random.sample(list(range(len(self.population))), 2)
+        self.parents = [self.population[index[0]], self.population[index[1]]]
         # Compute hamming distance
         parents_distance = hamming(self.parents[0], self.parents[1])
         # If hamming distance higher than l/2 change bits of one parent
@@ -34,9 +39,9 @@ class GLS:
             else:
                 child.append(random.randint(0,1))
                 index_free_bits.append(i)
-        return check_equality(length, index_free_bits, child)
+        return self.check_equality(length, index_free_bits, child)
 
-    def check_equality(self, length=500, possible_indeces, individual):
+    def check_equality(self, length, possible_indeces, individual):
         if sum(individual) != (length/2):
             number_changes = int(abs((length/2) - sum(individual)))
             change = random.sample(possible_indeces, number_changes)
@@ -47,37 +52,26 @@ class GLS:
                     individual[i] = 1
         return individual
 
-    def create_new_population(self, length = 500):
-        self.population_cutstate
+    def create_new_population(self, length, new_child, child_cutstate, ranked_population):
         new_population = []
-        random.shuffle(self.population)
-        index = random.sample((length-1), 2)
-        self.parent = [self.population[index[0]], self.population[index[1]]]
-        self.child = self.crossover(length=500)
-        # Apply FM to child
-        child_cutstate = 
         # Get worse individual
-        worst_cutstate = min(self.population_cutstate.keys())
-        contestant = self.population_cutstate[worst_cutstate]
-        if len(self.population_cutstate[worst_cutstate]) != 1:
-            contestant = contestant[random.randint(0, (len(self.population_cutstate)-1))]
+        worst_cutstate = max(ranked_population.keys())
+        contestant = ranked_population[worst_cutstate]
+        if len(ranked_population[worst_cutstate]) != 1:
+            contestant = contestant[random.randint(0, (len(ranked_population)-1))]
         # Make it compete with the child
         if child_cutstate >= worst_cutstate:
             for i in len(self.population):
                 if self.population[i] != contestant:
                     new_population.append(self.population[i])
                 else:
-                    new_population.append(child)
+                    new_population.append(new_child)
         else:
             new_population = self.population
         return new_population
 
-    def population_cutstate(self):
-        self.ranked_population = {}
-        for person in self.population:
-            cutstate = 
-
-            if cutstate in self.ranked_population:
-                self.ranked_population[cutstate].append(person)
-            else:
-                self.ranked_population[cutstate] = [person]
+    def transform_person(self, person):
+        new_person = {}
+        for i in range(len(person)):
+            new_person[i] = person[i]
+        return new_person
