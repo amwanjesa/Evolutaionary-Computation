@@ -43,6 +43,7 @@ if __name__ == '__main__':
         result = graph.fiduccia_mattheyses()
         previous_solution = result['solution']
         #print(previous_solution)
+        # print(f'Local search found cutstate {result["cutstate"]}')
         fm_solutions = fm_solutions.append(result, ignore_index=True)
         del graph
         if i == 200:
