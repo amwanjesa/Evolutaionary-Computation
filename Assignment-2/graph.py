@@ -121,19 +121,6 @@ class Graph:
                 seen.append(frozenset((node, neighbour)))
         return cutstate
 
-    def population_cutstate(self, person):
-        cutstate = 0
-        seen = []
-        for node in self.nodes:
-            connections = self.connections[node]
-            for neighbour in connections:
-                if frozenset((node, neighbour)) in seen:
-                    continue
-                if person[node-1] != person[neighbour-1]:
-                    cutstate += 1
-                seen.append(frozenset((node, neighbour)))
-        return cutstate
-
     def update_solution(self):
         new_cutstate = self.get_cutstate()
         if self.current_cutstate is not None:
@@ -180,7 +167,7 @@ class Graph:
         self.update_solution()
 
     def fiduccia_mattheyses(self):
-        for _ in range(10):
+        for _ in range(4):
             if self.block_a.has_free_nodes() and self.block_b.has_free_nodes():
                 self.bipartitioning()
             else:
