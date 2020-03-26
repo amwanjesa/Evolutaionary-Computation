@@ -3,7 +3,7 @@ from tqdm import tqdm
 from block import Block
 from operator import itemgetter
 
-seed(42)
+seed(21)
 
 
 class Node:
@@ -180,7 +180,7 @@ class Graph:
         self.update_solution()
 
     def fiduccia_mattheyses(self):
-        for _ in range(4):
+        for _ in range(10):
             if self.block_a.has_free_nodes() and self.block_b.has_free_nodes():
                 self.bipartitioning()
             else:
