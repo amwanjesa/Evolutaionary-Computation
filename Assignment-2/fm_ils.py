@@ -1,5 +1,5 @@
 import random
-from collections import Counter
+from os.path import join
 from time import perf_counter
 
 import pandas as pd
@@ -52,6 +52,7 @@ if __name__ == '__main__':
         'Assignment-2\Graph500.txt')
     mutation_rate = 0.01
     performance_stats = pd.DataFrame()
+    data_storage = join('Assignment-2', 'data', 'ils')
     for j in range(25):
         solutions = pd.DataFrame()
         cutstates = pd.DataFrame()
@@ -61,7 +62,8 @@ if __name__ == '__main__':
             graph = Graph(nodes=nodes, connections=connections,
                           freedoms=freedoms, degrees=degrees)
             if not solutions.empty:
-                best_solution = solutions['solution'].iloc[-1]
+                best_solution = solutions.loc[:,
+                                              solutions.columns != 'cutstate'].iloc[-1].to_dict()
                 graph.init_partition(
                     mutation(best_solution, perturbation=mutation_rate))
             else:
@@ -71,25 +73,22 @@ if __name__ == '__main__':
 
             # print(f'Local search found cutstate {result["cutstate"]}')
 
+            solution = result['solution']
+            solution['cutstate'] = result['cutstate']
             if solutions.empty:
                 solutions = solutions.append(
-                    result['solution'], ignore_index=True)
-                del result['solution']
-                cutstates = cutstates.append(result, ignore_index=True)
+                    solution, ignore_index=True)
             else:
                 best_cutstate = solutions['cutstate'].iloc[-1]
                 if result['cutstate'] < best_cutstate:
-                    solutions = solutions.append(
-                        result['solution'], ignore_index=True)
-                    del result['solution']
-                    cutstates = cutstates.append(result, ignore_index=True)
+                    solutions = solutions.append(solution, ignore_index=True)
                 elif result['cutstate'] == best_cutstate:
                     found_same_cutstate += 1
             del graph
-            if i == 200:
-                solutions.to_csv(f'ils_with_fm_200_{int(mutation_rate * 100)}_run{i + 1}.csv')
-        toc = time.perf_counter()
-        print(f" in {toc - tic:0.4f} seconds")
-        performance_stats = performance_stats.append({'Execution Time': toc - tic, 'No Change': found_same_cutstate}, ignore_index=True)
-        solutions.to_csv('ils_with_fm.csv')
-    performance_stats.to_csv(f'ils_with_fm_{int(mutation_rate * 100)}.csv')
+
+        toc = perf_counter()
+        performance_stats = performance_stats.append(
+            {'Execution Time': toc - tic, 'No Change': found_same_cutstate}, ignore_index=True)
+        solutions.to_csv(join(data_storage, f'ils_with_fm_run{j + 1}.csv'))
+    performance_stats.to_csv(
+        join(data_storage, f'ils_with_fm_{int(mutation_rate * 100)}_performance.csv'))
