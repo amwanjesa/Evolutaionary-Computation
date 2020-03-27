@@ -35,10 +35,11 @@ if __name__ == '__main__':
     graph = Graph(nodes=nodes, connections=connections,
                   freedoms=freedoms, degrees=degrees)
     solutions = pd.DataFrame()
-    for j in range(3):
+    for j in range(25):
         tic = perf_counter()
         best_solution = {}
-        for i in tqdm(range(10), desc='Fiducca Mattheyses experiments'):
+
+        for i in tqdm(range(2500), desc='Fiducca Mattheyses experiments'):
             if best_solution:
                 graph.init_partition(best_solution['solution'])
             else:
