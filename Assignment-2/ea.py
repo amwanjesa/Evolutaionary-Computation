@@ -1,7 +1,6 @@
 import random
 import numpy as np
 from scipy.spatial.distance import hamming
-from graph import *
 
 random.seed(673)
 
@@ -12,14 +11,12 @@ class GLS:
         self.population = self.generate_population(length=500, size=population_size)
 
     def generate_population(self, length=500, size=50):
-        # !!! Try mixing two lists
         def get_binary_string(length):
             person = []
             for i in range(length):
                 # Create the person
-                person.append(random.randint(0,1))
-            # Check if the individuals have 250 1's and 250 0's and correct them
-            return self.check_equality(length, list(range(length)), person)
+                person = np.random.choice(np.concatenate([[1]*250,[0]*250]), length, replace = False)
+            return person
         return [get_binary_string(length) for i in range(size)]
 
     def crossover(self, length=500):
