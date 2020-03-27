@@ -34,30 +34,28 @@ if __name__ == '__main__':
     performance_stats = pd.DataFrame()
     graph = Graph(nodes=nodes, connections=connections,
                   freedoms=freedoms, degrees=degrees)
-    for j in range(25):
-        solutions = pd.DataFrame()
+    solutions = pd.DataFrame()
+    for j in range(3):
         tic = perf_counter()
-        for i in tqdm(range(2500), desc='Fiducca Mattheyses experiments'):
-            if not solutions.empty:
-                best_solution = solutions.loc[:,
-                                              solutions.columns != 'cutstate'].iloc[-1].to_dict()
-                graph.init_partition(best_solution)
+        best_solution = {}
+        for i in tqdm(range(10), desc='Fiducca Mattheyses experiments'):
+            if best_solution:
+                graph.init_partition(best_solution['solution'])
             else:
                 graph.init_partition()
 
             graph.setup_gains()
             result = graph.fiduccia_mattheyses()
 
-            solution = result['solution']
-            solution['cutstate'] = result['cutstate']
 
-            solutions = solutions.append(
-                solution, ignore_index=True)
-            del graph
+        solution = result['solution']
+        solution['cutstate'] = result['cutstate']
 
+        solutions = solutions.append(
+            solution, ignore_index=True)
         toc = perf_counter()
         performance_stats = performance_stats.append(
             {'Execution Time': toc - tic}, ignore_index=True)
-        solutions.to_csv(join(data_storage, f'mls_with_fm_run{j + 1}.csv'))
+    solutions.to_csv(join(data_storage, f'mls_with_fm_run{j + 1}.csv'))
     performance_stats.to_csv(
         join(data_storage, f'mls_with_fm_performance.csv'))
