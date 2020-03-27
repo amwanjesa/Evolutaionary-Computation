@@ -12,6 +12,7 @@ class GLS:
         self.population = self.generate_population(length=500, size=population_size)
 
     def generate_population(self, length=500, size=50):
+        # !!! Try mixing two lists
         def get_binary_string(length):
             person = []
             for i in range(length):
@@ -25,13 +26,13 @@ class GLS:
         # Uniform crossover
         child = []
         index_free_bits = []
-        # Suhffle population
-        random.shuffle(self.population)
+
         # Get the indeces for the parents
-        index = random.sample(list(range(len(self.population))), 2)
-        self.parents = [self.population[index[0]], self.population[index[1]]]
+        self.parents = random.sample(self.population, 2)
+
         # Compute hamming distance
         parents_distance = hamming(self.parents[0], self.parents[1])
+
         # If hamming distance higher than l/2 change all the bits of one parent
         if parents_distance > 0.5:
             new_parent = [1 if number == 0 else 0 for number in self.parents[0]]
@@ -104,7 +105,4 @@ class GLS:
 
     def transform_person(self, person):
         # Change from list to dictionary to use the person as input for the FM
-        new_person = {}
-        for i in range(len(person)):
-            new_person[i] = person[i]
-        return new_person
+        return  {i + 1: person[i] for i in range(len(person))}

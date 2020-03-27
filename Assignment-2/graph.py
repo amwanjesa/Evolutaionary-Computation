@@ -78,10 +78,10 @@ class Graph:
 
     def setup_gains(self):
         for node in self.nodes:
-            if self.block_a.contains_node(node):
+            if self.block_a.contains_node(node) and self.block_a.freedoms[node]:
                 gain = self.calculate_gain(node)
                 self.block_a.save_node_at_gain(node, gain)
-            elif self.block_b.contains_node(node):
+            elif self.block_b.contains_node(node) and self.block_b.freedoms[node]:
                 gain = self.calculate_gain(node)
                 self.block_b.save_node_at_gain(node, gain)
 

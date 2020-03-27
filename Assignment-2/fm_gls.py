@@ -19,13 +19,15 @@ def read_graph_data(filename):
         for line in f:
             l = line.split()
             if len(l) > 0:
-                node, degree, neighbours = int(l[0]), int(l[2]), [int(x) for x in l[3:]]
+                node, degree, neighbours = int(l[0]), int(l[2]), [
+                    int(x) for x in l[3:]]
                 connections[node] = neighbours
                 freedoms[node] = True
                 nodes.append(node)
                 degrees[node] = degree
 
-    return  nodes, connections, degrees, freedoms
+    return nodes, connections, degrees, freedoms
+
 
 def transform_results(results_dict):
     new_child = []
@@ -35,20 +37,23 @@ def transform_results(results_dict):
         new_child.append(solution_dict[i])
     return cutstate, new_child
 
+
 if __name__ == '__main__':
 
-    fm_solutions = pd.DataFrame(columns = ['Cutstate'])#, 'Solution'])
+    fm_solutions = pd.DataFrame(columns=['Cutstate'])  # , 'Solution'])
     previous_solution = {}
-    nodes, connections, degrees, freedoms = read_graph_data('Graph500.txt')
+    nodes, connections, degrees, freedoms = read_graph_data(
+        'Assignment-2\Graph500.txt')
     # Create gls and graph object
-    gls = GLS(population_size = 50)
-    graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)
-    
+    gls = GLS(population_size=50)
+
     # Improve population by running the FM on each individual once
     ranked_population = {}
     improved_population = []
-    for person in tqdm(gls.population, desc='Population improvement'):
-        graph.init_partition(gls.transform_person(person))
+    graph = Graph(nodes=nodes, connections=connections,
+                  freedoms=freedoms, degrees=degrees)
+    for individual in tqdm(gls.population, desc='Population improvement'):
+        graph.init_partition(gls.transform_person(individual))
         graph.setup_gains()
         result = graph.fiduccia_mattheyses()
         cutstate, solution = transform_results(result)
@@ -70,8 +75,10 @@ if __name__ == '__main__':
         result = graph.fiduccia_mattheyses()
         child_cutstate, new_child = transform_results(result)
         print(f'Child cutstate {child_cutstate}')
-        #Create new population
-        ranked_population = gls.create_new_population(500, new_child, child_cutstate, ranked_population)
+        # Create new population
+        ranked_population = gls.create_new_population(
+            500, new_child, child_cutstate, ranked_population)
         print(f'Cutstates {sorted(ranked_population.keys())}')
-        fm_solutions = fm_solutions.append({'Cutstate': sorted(ranked_population.keys())}, ignore_index=True)
+        fm_solutions = fm_solutions.append(
+            {'Cutstate': sorted(ranked_population.keys())}, ignore_index=True)
     fm_solutions.to_csv('gls_with_fm.csv')
