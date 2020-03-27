@@ -32,12 +32,12 @@ if __name__ == '__main__':
         'Assignment-2\Graph500.txt')
     data_storage = join('Assignment-2', 'data', 'mls')
     performance_stats = pd.DataFrame()
+    graph = Graph(nodes=nodes, connections=connections,
+                  freedoms=freedoms, degrees=degrees)
     for j in range(25):
         solutions = pd.DataFrame()
         tic = perf_counter()
         for i in tqdm(range(2500), desc='Fiducca Mattheyses experiments'):
-            graph = Graph(nodes=nodes, connections=connections,
-                          freedoms=freedoms, degrees=degrees)
             if not solutions.empty:
                 best_solution = solutions.loc[:,
                                               solutions.columns != 'cutstate'].iloc[-1].to_dict()

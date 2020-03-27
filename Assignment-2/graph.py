@@ -35,7 +35,6 @@ class Graph:
         self.degrees.append(degree)
         self.freedoms[new_node_id] = True
 
-
     def remove_node(self, node):
         self.nodes.remove(node)
 
@@ -68,8 +67,10 @@ class Graph:
             nodes_1 = self.nodes[:halfway]
             nodes_2 = self.nodes[halfway:]
 
-            freedoms_1 = {k:v for k,v in self.freedoms.items() if k in nodes_1}
-            freedoms_2 = {k:v for k,v in self.freedoms.items() if k in nodes_2}
+            freedoms_1 = {k: v for k, v in self.freedoms.items()
+                          if k in nodes_1}
+            freedoms_2 = {k: v for k, v in self.freedoms.items()
+                          if k in nodes_2}
 
             self.block_a = Block(
                 nodes=nodes_1, freedoms=freedoms_1, max_degree=max(self.degrees))
@@ -102,9 +103,9 @@ class Graph:
         solution = {}
         for node in self.nodes:
             if self.block_a.contains_node(node):
-                solution[node]= 1
+                solution[node] = 1
             else:
-                solution[node]= 0
+                solution[node] = 0
         return solution
 
     def get_cutstate(self):
@@ -115,7 +116,8 @@ class Graph:
             for neighbour in connections:
                 if frozenset((node, neighbour)) in seen:
                     continue
-                node_block = self.block_a if self.block_a.contains_node(node) else self.block_b
+                node_block = self.block_a if self.block_a.contains_node(
+                    node) else self.block_b
                 if not all([node_block.contains_node(cell) for cell in (node, neighbour)]):
                     cutstate += 1
                 seen.append(frozenset((node, neighbour)))
