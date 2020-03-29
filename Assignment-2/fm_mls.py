@@ -37,26 +37,28 @@ if __name__ == '__main__':
     solutions = pd.DataFrame()
     for j in range(25):
         tic = perf_counter()
-        best_solution = {}
+        previous_solution = {}
 
         for i in tqdm(range(2500), desc='Fiducca Mattheyses experiments'):
-            if best_solution:
-                graph.init_partition(best_solution['solution'])
+            if previous_solution:
+                graph.init_partition(previous_solution['solution'])
             else:
                 graph.init_partition()
 
             graph.setup_gains()
             result = graph.fiduccia_mattheyses()
+            previous_solution = result
 
 
-        solution = result['solution']
-        solution['cutstate'] = result['cutstate']
+
+        solution = previous_solution['solution']
+        solution['cutstate'] = previous_solution['cutstate']
 
         solutions = solutions.append(
             solution, ignore_index=True)
         toc = perf_counter()
         performance_stats = performance_stats.append(
             {'Execution Time': toc - tic}, ignore_index=True)
-    solutions.to_csv(join(data_storage, f'mls_with_fm_run{j + 1}.csv'))
+    solutions.to_csv(join(data_storage, f'mls_with_fm.csv'))
     performance_stats.to_csv(
         join(data_storage, f'mls_with_fm_performance.csv'))
