@@ -1,7 +1,7 @@
-import logging
-import pprint
-import traceback
-from collections import Counter
+import numpy as np
+import random
+from os.path import join
+from time import perf_counter
 
 import pandas as pd
 from tqdm import tqdm
@@ -40,45 +40,49 @@ def transform_results(results_dict):
 
 if __name__ == '__main__':
 
-    fm_solutions = pd.DataFrame(columns=['Cutstate'])  # , 'Solution'])
-    previous_solution = {}
-    nodes, connections, degrees, freedoms = read_graph_data(
-        'Assignment-2\Graph500.txt')
-    # Create gls and graph object
-    gls = GLS(population_size=50)
+    nodes, connections, degrees, freedoms = read_graph_data('Graph500.txt')
+    data_storage = join('data', 'gls')
+    performance_stats = pd.DataFrame()
+    graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)    
+    solutions = pd.DataFrame(columns = ['Cutstate'])
 
-    # Improve population by running the FM on each individual once
-    ranked_population = {}
-    improved_population = []
-    graph = Graph(nodes=nodes, connections=connections,
-                  freedoms=freedoms, degrees=degrees)
-    for individual in tqdm(gls.population, desc='Population improvement'):
-        graph.init_partition(gls.transform_person(individual))
-        graph.setup_gains()
-        result = graph.fiduccia_mattheyses()
-        cutstate, solution = transform_results(result)
-        improved_population.append(solution)
-        if cutstate in ranked_population:
-            ranked_population[cutstate].append(solution)
-        else:
-            ranked_population[cutstate] = [solution]
-    # Update the population with the improved one
-    gls.population = improved_population
+    for j in range(25):
+        tic = perf_counter()
+        best_solution = {}
+        # Create gls and graph object
+        gls = GLS(population_size=50)
 
-    # Create children
-    for i in tqdm(range(2450), desc='Fiducca Mattheyses experiments'):
-        # Create child
-        child = gls.crossover()
-        # Compute FM
-        graph.init_partition(gls.transform_person(child))
-        graph.setup_gains()
-        result = graph.fiduccia_mattheyses()
-        child_cutstate, new_child = transform_results(result)
-        print(f'Child cutstate {child_cutstate}')
-        # Create new population
-        ranked_population = gls.create_new_population(
-            500, new_child, child_cutstate, ranked_population)
-        print(f'Cutstates {sorted(ranked_population.keys())}')
-        fm_solutions = fm_solutions.append(
-            {'Cutstate': sorted(ranked_population.keys())}, ignore_index=True)
-    fm_solutions.to_csv('gls_with_fm.csv')
+        # Improve population by running the FM on each individual once
+        ranked_population = {}
+        improved_population = []
+        for individual in tqdm(gls.population, desc='Population improvement'):
+            graph.init_partition(gls.transform_person(individual))
+            graph.setup_gains()
+            result = graph.fiduccia_mattheyses()
+            cutstate, solution = transform_results(result)
+            improved_population.append(solution)
+            if cutstate in ranked_population:
+                ranked_population[cutstate].append(solution)
+            else:
+                ranked_population[cutstate] = [solution]
+        # Update the population with the improved one
+        gls.population = improved_population
+
+        # Create children
+        for i in tqdm(range(2450), desc='Fiducca Mattheyses experiments'):
+            # Create child
+            child = gls.crossover()
+            # Compute FM
+            graph.init_partition(gls.transform_person(child))
+            graph.setup_gains()
+            result = graph.fiduccia_mattheyses()
+            child_cutstate, new_child = transform_results(result)
+            # Create new population
+            ranked_population = gls.create_new_population(500, new_child, child_cutstate, ranked_population)
+
+        solutions = solutions.append({'Cutstate': sorted(ranked_population.keys())}, ignore_index=True)
+        toc = perf_counter()
+        performance_stats = performance_stats.append({'Execution Time': toc - tic}, ignore_index=True)
+    
+    solutions.to_csv(join(data_storage, f'gls_with_fm.csv'))
+    performance_stats.to_csv(join(data_storage, f'gls_with_fm_performance.csv'))
