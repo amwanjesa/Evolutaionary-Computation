@@ -5,6 +5,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from graph import *
+from time_limit import time_limit, TimeoutException
 
 
 def read_graph_data(filename):
@@ -31,34 +32,33 @@ if __name__ == '__main__':
     nodes, connections, degrees, freedoms = read_graph_data(
         'Graph500.txt')
     data_storage = join('data', 'mls')
-    performance_stats = pd.DataFrame()
     solutions = pd.DataFrame()
-    for j in range(25):
-        graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)
-        tic = perf_counter()
-        previous_solution = {}
+    limit_in_seconds = 60
+    for j in range(2):
+        try:
+            graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)
+            previous_solution = {}
+            with(time_limit(limit_in_seconds, 'MLS')):
+                while True:
+                    if previous_solution:
+                        graph.init_partition(previous_solution['solution'])
+                    else:
+                        graph.init_partition()
 
-        for i in tqdm(range(2500), desc='Fiducca Mattheyses experiments'):
-            if previous_solution:
-                graph.init_partition(previous_solution['solution'])
-            else:
-                graph.init_partition()
-
-            graph.setup_gains()
-            result = graph.fiduccia_mattheyses()
-            previous_solution = result
+                    graph.setup_gains()
+                    result = graph.fiduccia_mattheyses()
+                    previous_solution = result
 
 
 
-        solution = previous_solution['solution']
-        solution['cutstate'] = previous_solution['cutstate']
+                solution['cutstate'] = previous_solution['cutstate']
+                solution = previous_solution['solution']
 
-        solutions = solutions.append(
-            solution, ignore_index=True)
-        toc = perf_counter()
-        performance_stats = performance_stats.append(
-            {'Execution Time': toc - tic}, ignore_index=True)
-        del graph
-    solutions.to_csv(join(data_storage, f'mls_with_fm.csv'))
-    performance_stats.to_csv(
-        join(data_storage, f'mls_with_fm_performance.csv'))
+                solutions = solutions.append(
+                    solution, ignore_index=True)
+                del graph
+        except TimeoutException:
+            toc2 = perf_counter()
+            print(f'MLS timed out after {toc2 - tic2}')
+            solutions.to_csv(join(data_storage, f'mls_with_fm_time_limited_{limit_in_seconds}.csv'))
+    solutions.to_csv(join(data_storage, f'mls_with_fm_time_limited_{limit_in_seconds}.csv'))

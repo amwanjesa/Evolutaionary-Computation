@@ -64,10 +64,10 @@ if __name__ == '__main__':
     average_ils_03 = np.mean(data_03)
     average_gls_data = np.mean(gls_data_cutstate)
 
-    #get_plot(mls_data['cutstate'], mode = 'MLS')
-    #get_plot([data_001, data_005, data_01, data_02, data_03], mode = 'ILS')
-    #get_plot(gls_data_cutstate, mode = 'GLS')
-    #get_plot([mls_data['cutstate'], data_001, data_005, data_01, data_02, data_03, gls_data_cutstate], mode = 'ALL')
+    get_plot(mls_data['cutstate'], mode = 'MLS')
+    get_plot([data_001, data_005, data_01, data_02, data_03], mode = 'ILS')
+    get_plot(gls_data_cutstate, mode = 'GLS')
+    get_plot([mls_data['cutstate'], data_001, data_005, data_01, data_02, data_03, gls_data_cutstate], mode = 'ALL')
 
     # Wilcoxon test
     wilcoxon_mls_gls = wilcoxon(mls_data['cutstate'], gls_data_cutstate)
