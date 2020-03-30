@@ -35,6 +35,7 @@ if __name__ == '__main__':
     solutions = pd.DataFrame()
     limit_in_seconds = 60
     for j in range(2):
+        tic2 = perf_counter()
         try:
             graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)
             previous_solution = {}
