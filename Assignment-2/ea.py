@@ -2,7 +2,7 @@ import random
 import numpy as np
 from scipy.spatial.distance import hamming
 
-random.seed(673)
+#random.seed(673)
 
 
 class GLS:

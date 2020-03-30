@@ -29,13 +29,12 @@ def read_graph_data(filename):
 if __name__ == '__main__':
 
     nodes, connections, degrees, freedoms = read_graph_data(
-        'Assignment-2\Graph500.txt')
-    data_storage = join('Assignment-2', 'data', 'mls')
+        'Graph500.txt')
+    data_storage = join('data', 'mls')
     performance_stats = pd.DataFrame()
-    graph = Graph(nodes=nodes, connections=connections,
-                  freedoms=freedoms, degrees=degrees)
     solutions = pd.DataFrame()
     for j in range(25):
+        graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)
         tic = perf_counter()
         previous_solution = {}
 
@@ -59,6 +58,7 @@ if __name__ == '__main__':
         toc = perf_counter()
         performance_stats = performance_stats.append(
             {'Execution Time': toc - tic}, ignore_index=True)
+        del graph
     solutions.to_csv(join(data_storage, f'mls_with_fm.csv'))
     performance_stats.to_csv(
         join(data_storage, f'mls_with_fm_performance.csv'))
