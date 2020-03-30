@@ -50,13 +50,13 @@ if __name__ == '__main__':
 
     nodes, connections, degrees, freedoms = read_graph_data(
         'Assignment-2\Graph500.txt')
-    mutation_rates = [0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.99]
+    mutation_rates = [0.01, 0.03, 0.05, 0.1, 0.2]
     performance_stats = pd.DataFrame()
-    graph = Graph(nodes=nodes, connections=connections,
-                  freedoms=freedoms, degrees=degrees)
     data_storage = join('Assignment-2', 'data', 'ils')
     solutions = pd.DataFrame()
     for mutation_rate in mutation_rates:
+        graph = Graph(nodes=nodes, connections=connections,
+                      freedoms=freedoms, degrees=degrees)
         for j in range(25):
             cutstates = pd.DataFrame()
             found_same_cutstate = 0
@@ -71,14 +71,13 @@ if __name__ == '__main__':
 
                 graph.setup_gains()
                 result = graph.fiduccia_mattheyses()
-                
-                if not best_solution: 
+
+                if not best_solution:
                     best_solution = result
                 elif result['cutstate'] < best_solution['cutstate']:
                     best_solution = result
                 elif result['cutstate'] == best_solution['cutstate']:
                     found_same_cutstate += 1
-
 
             solution = best_solution['solution']
             solution['cutstate'] = best_solution['cutstate']
@@ -87,6 +86,8 @@ if __name__ == '__main__':
             toc = perf_counter()
             performance_stats = performance_stats.append(
                 {'Execution Time': toc - tic, 'No Change': found_same_cutstate}, ignore_index=True)
-        solutions.to_csv(join(data_storage, f'ils_with_fm_{str(mutation_rate)}.csv'))
+        solutions.to_csv(
+            join(data_storage, f'ils_with_fm_{str(mutation_rate)}.csv'))
         performance_stats.to_csv(
             join(data_storage, f'ils_with_fm_{str(mutation_rate)}_performance.csv'))
+        del graph
