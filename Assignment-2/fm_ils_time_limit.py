@@ -6,6 +6,7 @@ import pandas as pd
 from tqdm import tqdm
 
 from graph import *
+from time_limit import time_limit, TimeoutException
 
 
 def read_graph_data(filename):
@@ -50,43 +51,43 @@ if __name__ == '__main__':
 
     nodes, connections, degrees, freedoms = read_graph_data(
         'Graph500.txt')
-    mutation_rates = [0.01, 0.03, 0.05, 0.1, 0.2]
-    performance_stats = pd.DataFrame()
+    mutation_rates = [0.01, 0.03, 0.05]  # , 0.1, 0.2]
     data_storage = join('data', 'ils')
     solutions = pd.DataFrame()
+    limit_in_seconds = 40
     for mutation_rate in mutation_rates:
         for j in range(25):
-            graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)
+            graph = Graph(nodes=nodes, connections=connections,
+                          freedoms=freedoms, degrees=degrees)
             cutstates = pd.DataFrame()
             found_same_cutstate = 0
             tic = perf_counter()
             best_solution = {}
-            for i in tqdm(range(2500), desc='Fiducca Mattheyses experiments'):
-                if best_solution:
-                    graph.init_partition(
-                        mutation(best_solution['solution'], perturbation=mutation_rate))
-                else:
-                    graph.init_partition()
+            try:
+                with(time_limit(limit_in_seconds, 'MLS')):
+                    while True:
+                        if best_solution:
+                            graph.init_partition(
+                                mutation(best_solution['solution'], perturbation=mutation_rate))
+                        else:
+                            graph.init_partition()
 
-                graph.setup_gains()
-                result = graph.fiduccia_mattheyses()
+                        graph.setup_gains()
+                        result = graph.fiduccia_mattheyses()
 
-                if not best_solution:
-                    best_solution = result
-                elif result['cutstate'] < best_solution['cutstate']:
-                    best_solution = result
-                elif result['cutstate'] == best_solution['cutstate']:
-                    found_same_cutstate += 1
-
+                        if not best_solution:
+                            best_solution = result
+                        elif result['cutstate'] < best_solution['cutstate']:
+                            best_solution = result
+                        elif result['cutstate'] == best_solution['cutstate']:
+                            found_same_cutstate += 1
+            except TimeoutException:
+                pass
+            del graph
             solution = best_solution['solution']
             solution['cutstate'] = best_solution['cutstate']
             solutions = solutions.append(
                 solution, ignore_index=True)
             toc = perf_counter()
-            performance_stats = performance_stats.append(
-                {'Execution Time': toc - tic, 'No Change': found_same_cutstate}, ignore_index=True)
-            del graph
         solutions.to_csv(
-            join(data_storage, f'ils_with_fm_{str(mutation_rate)}.csv'))
-        performance_stats.to_csv(
-            join(data_storage, f'ils_with_fm_{str(mutation_rate)}_performance.csv'))
+            join(data_storage, f'ils_with_fm_{str(mutation_rate)}_{limit_in_seconds}.csv'))
