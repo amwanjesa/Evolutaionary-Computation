@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
     nodes, connections, degrees, freedoms = read_graph_data(
         'Graph500.txt')
-    mutation_rates = [0.01, 0.03, 0.05]#, 0.1, 0.2]
+    mutation_rates = [0.01, 0.03, 0.05, 0.1, 0.2]
     performance_stats = pd.DataFrame()
     data_storage = join('data', 'ils')
     solutions = pd.DataFrame()
@@ -83,7 +83,6 @@ if __name__ == '__main__':
             solutions = solutions.append(
                 solution, ignore_index=True)
             toc = perf_counter()
-            del graph
             performance_stats = performance_stats.append(
                 {'Execution Time': toc - tic, 'No Change': found_same_cutstate}, ignore_index=True)
             del graph
