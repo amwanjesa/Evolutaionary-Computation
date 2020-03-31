@@ -90,4 +90,4 @@ if __name__ == '__main__':
                 solution, ignore_index=True)
             toc = perf_counter()
         solutions.to_csv(
-            join(data_storage, f'ils_with_fm_{str(mutation_rate)}_{limit_in_seconds}.csv'))
+            join(data_storage, f'ils_with_fm_{str(mutation_rate)}_limit_{limit_in_seconds}.csv'))

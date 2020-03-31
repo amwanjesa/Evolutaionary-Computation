@@ -60,4 +60,4 @@ if __name__ == '__main__':
         solutions = solutions.append(
             solution, ignore_index=True)
         del graph
-    solutions.to_csv(join(data_storage, f'mls_with_fm_time_limited_{limit_in_seconds}.csv'))
+    solutions.to_csv(join(data_storage, f'mls_with_fm_time_limit_{limit_in_seconds}.csv'))
