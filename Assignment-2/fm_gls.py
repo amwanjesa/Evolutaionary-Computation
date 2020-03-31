@@ -43,7 +43,6 @@ if __name__ == '__main__':
     nodes, connections, degrees, freedoms = read_graph_data('Graph500.txt')
     data_storage = join('data', 'gls')
     performance_stats = pd.DataFrame()
-    graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)    
     solutions = pd.DataFrame(columns = ['Cutstate'])
 
     for j in range(25):
@@ -51,6 +50,7 @@ if __name__ == '__main__':
         best_solution = {}
         # Create gls and graph object
         gls = GLS(population_size=50)
+        graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)    
 
         # Improve population by running the FM on each individual once
         ranked_population = {}
@@ -79,10 +79,13 @@ if __name__ == '__main__':
             child_cutstate, new_child = transform_results(result)
             # Create new population
             ranked_population = gls.create_new_population(500, new_child, child_cutstate, ranked_population)
-
         solutions = solutions.append({'Cutstate': sorted(ranked_population.keys())}, ignore_index=True)
         toc = perf_counter()
         performance_stats = performance_stats.append({'Execution Time': toc - tic}, ignore_index=True)
-    
+        
+        # Delete gls and graph
+        del gls
+        del graph
+
     solutions.to_csv(join(data_storage, f'gls_with_fm.csv'))
     performance_stats.to_csv(join(data_storage, f'gls_with_fm_performance.csv'))
