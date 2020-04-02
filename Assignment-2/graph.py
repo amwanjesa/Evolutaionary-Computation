@@ -170,8 +170,7 @@ class Graph:
 
     def fiduccia_mattheyses(self):
         for _ in range(4):
-            if self.block_a.has_free_nodes() and self.block_b.has_free_nodes():
+            while self.block_a.has_free_nodes() and self.block_b.has_free_nodes():
                 self.bipartitioning()
-            else:
-                break
+            self.update_solution()
         return {'solution': self.current_solution, 'cutstate': self.current_cutstate}
