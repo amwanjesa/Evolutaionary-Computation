@@ -3,7 +3,7 @@ from tqdm import tqdm
 from block import Block
 from operator import itemgetter
 
-#seed(21)
+# seed(21)
 
 
 class Node:
@@ -27,6 +27,10 @@ class Graph:
         self.freedoms = freedoms
         self.block_a = None
         self.block_b = None
+
+        self.best_solution = []
+        self.best_cutstate = None
+
         self.current_solution = []
         self.current_cutstate = None
 
@@ -169,8 +173,22 @@ class Graph:
         self.update_solution()
 
     def fiduccia_mattheyses(self):
-        for _ in range(4):
+        keep_searching = True
+        while keep_searching:
             while self.block_a.has_free_nodes() and self.block_b.has_free_nodes():
-                self.bipartitioning()
-            self.update_solution()
+                self.swap()
+
+            if self.best_cutstate is not None:
+                if self.best_cutstate > self.current_cutstate:
+                    self.best_solution = self.current_solution
+                    self.best_cutstate = self.current_cutstate
+                else:
+                    break
+            else:
+                self.best_cutstate = self.current_cutstate
+                self.best_solution = self.current_solution
+            self.block_a.free_all_nodes()
+            self.block_b.free_all_nodes()
+            self.setup_gains()
+
         return {'solution': self.current_solution, 'cutstate': self.current_cutstate}

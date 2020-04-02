@@ -3,7 +3,7 @@ from tqdm import tqdm
 from block import Block
 from operator import itemgetter
 
-#seed(21)
+# seed(21)
 
 
 class Node:
