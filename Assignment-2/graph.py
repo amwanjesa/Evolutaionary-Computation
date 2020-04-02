@@ -27,8 +27,14 @@ class Graph:
         self.freedoms = freedoms
         self.block_a = None
         self.block_b = None
+
+        self.best_solution = []
+        self.best_cutstate = None
+
         self.current_solution = []
         self.current_cutstate = None
+
+        self.fm_limit = 10000
 
     def add_node(self, new_node_id, degree):
         self.nodes.append(new_node_id)
@@ -133,7 +139,7 @@ class Graph:
             self.current_solution = self.get_solution()
             self.current_cutstate = new_cutstate
 
-    def bipartitioning(self):
+    def swap(self):
         largest_block = self.block_a if self.block_a.size > self.block_b.size else self.block_b
         possible_nodes = largest_block.get_free_node_with_highest_gain()
         node_index = randint(0, (len(possible_nodes)-1))
@@ -169,8 +175,23 @@ class Graph:
         self.update_solution()
 
     def fiduccia_mattheyses(self):
-        for _ in range(4):
+        keep_searching = True
+        while keep_searching and self.fm_limit:
             while self.block_a.has_free_nodes() and self.block_b.has_free_nodes():
-                self.bipartitioning()
-            self.update_solution()
+                self.swap()
+
+            if self.best_cutstate is not None:
+                if self.best_cutstate > self.current_cutstate:
+                    self.best_solution = self.current_solution
+                    self.best_cutstate = self.current_cutstate
+                else:
+                    break
+            else:
+                self.best_cutstate = self.current_cutstate
+                self.best_solution = self.current_solution
+            self.block_a.free_all_nodes()
+            self.block_b.free_all_nodes()
+            self.setup_gains()
+            self.fm_limit -= 1 
+
         return {'solution': self.current_solution, 'cutstate': self.current_cutstate}

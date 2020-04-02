@@ -38,7 +38,9 @@ if __name__ == '__main__':
         tic = perf_counter()
         previous_solution = {}
 
-        for i in tqdm(range(2500), desc='Fiducca Mattheyses experiments'):
+        # for i in tqdm(range(2500), desc='Fiducca Mattheyses experiments'):
+        pbar = tqdm(total = 10000, desc='Fiducca Mattheyses experiments')
+        while graph.fm_limit:
             if previous_solution:
                 graph.init_partition(previous_solution['solution'])
             else:
@@ -47,6 +49,8 @@ if __name__ == '__main__':
             graph.setup_gains()
             result = graph.fiduccia_mattheyses()
             previous_solution = result
+            pbar.update(10000 - graph.fm_limit)
+        pbar.close()
 
 
 
