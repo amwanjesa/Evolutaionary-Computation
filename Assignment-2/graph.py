@@ -3,21 +3,6 @@ from tqdm import tqdm
 from block import Block
 from operator import itemgetter
 
-# seed(21)
-
-
-class Node:
-
-    def __init__(self, id, degree):
-        self.id = id
-        self.degree = degree
-        self.free = True
-
-
-class Edge:
-    def __init__(self, endpoint_1, endpoint_2):
-        self.pair = set([endpoint_1, endpoint_2])
-
 
 class Graph:
     def __init__(self, nodes=[], degrees=[], connections={}, freedoms={}):
@@ -89,7 +74,6 @@ class Graph:
     def calculate_gain(self, node):
         gain = 0
 
-        #!!! This might be wrong
         node_block = self.block_a if self.block_a.contains_node(
             node) else self.block_b
         for neighbour in self.connections[node]:
