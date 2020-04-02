@@ -176,7 +176,7 @@ class Graph:
 
     def fiduccia_mattheyses(self):
         keep_searching = True
-        while keep_searching and self.fm_limit:
+        while keep_searching:
             while self.block_a.has_free_nodes() and self.block_b.has_free_nodes():
                 self.swap()
 
@@ -192,6 +192,5 @@ class Graph:
             self.block_a.free_all_nodes()
             self.block_b.free_all_nodes()
             self.setup_gains()
-            self.fm_limit -= 1 
 
         return {'solution': self.current_solution, 'cutstate': self.current_cutstate}
