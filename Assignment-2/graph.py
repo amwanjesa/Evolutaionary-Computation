@@ -179,7 +179,7 @@ class Graph:
     def fiduccia_mattheyses(self):
         keep_searching = True
         while keep_searching and self.fm_limit:
-            while self.block_a.has_free_nodes() and self.block_b.has_free_nodes():
+            while self.block_a.has_free_nodes() and self.block_b.has_free_nodes() and len(self.bucket_list) != 0:
                 self.swap()
 
             if self.best_cutstate is not None:
@@ -193,6 +193,7 @@ class Graph:
                 self.best_solution = self.current_solution
             self.block_a.free_all_nodes()
             self.block_b.free_all_nodes()
+            self.bucket_list = self.nodes
             self.setup_gains()
             self.fm_limit -= 1 
 
