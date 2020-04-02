@@ -53,3 +53,7 @@ class Block:
     
     def has_free_nodes(self):
         return any(x for x in self.freedoms.values())
+
+    def free_all_nodes(self):
+        for node in self.freedoms.keys():
+            self.freedoms[node] = True

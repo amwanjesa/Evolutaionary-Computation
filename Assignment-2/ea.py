@@ -48,9 +48,10 @@ class GLS:
                     child.append(random.randint(0,1))
                     index_free_bits.append(i)
             # Check that the child does not break the equality criterion
-            return self.check_equality(length, index_free_bits, child)
+            return GLS.check_equality(length, index_free_bits, child)
 
-    def check_equality(self, length, possible_indeces, individual):
+    @staticmethod
+    def check_equality(length, possible_indeces, individual):
         # Check the number of ones
         if sum(individual) != (length/2):
             # Calculate the number of changes to fix the kid
