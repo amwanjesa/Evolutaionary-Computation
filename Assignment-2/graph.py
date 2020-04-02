@@ -27,7 +27,7 @@ class Graph:
         self.freedoms = freedoms
         self.block_a = None
         self.block_b = None
-
+        self.bucket_list = nodes
         self.best_solution = []
         self.best_cutstate = None
 
@@ -84,11 +84,11 @@ class Graph:
                 nodes=nodes_2, freedoms=freedoms_2, max_degree=max(self.degrees))
 
     def setup_gains(self):
-        for node in self.nodes:
-            if self.block_a.contains_node(node) and self.block_a.freedoms[node]:
+        for node in self.bucket_list:#self.nodes:
+            if self.block_a.contains_node(node): #and self.block_a.freedoms[node]:
                 gain = self.calculate_gain(node)
                 self.block_a.save_node_at_gain(node, gain)
-            elif self.block_b.contains_node(node) and self.block_b.freedoms[node]:
+            elif self.block_b.contains_node(node): #and self.block_b.freedoms[node]:
                 gain = self.calculate_gain(node)
                 self.block_b.save_node_at_gain(node, gain)
 
@@ -154,6 +154,7 @@ class Graph:
         other_block.lock_node(node)
 
         # Updated gains using self.setup_gains
+        self.bucket_list.pop(self.bucket_list.index(node))
         self.setup_gains()
 
         # Select new node
@@ -169,6 +170,7 @@ class Graph:
         largest_block.lock_node(node)
 
         # Gains update
+        self.bucket_list.pop(self.bucket_list.index(node))
         self.setup_gains()
 
         # Calculate new solution
