@@ -28,6 +28,7 @@ def read_graph_data(filename):
 
     return nodes, connections, degrees, freedoms
 
+
 def mutation(solution, perturbation=0.01):
     def mutate(current_solution, perturbation):
         new_solution = {}
@@ -42,9 +43,10 @@ def mutation(solution, perturbation=0.01):
         return new_solution
 
     new_solution = mutate(solution, perturbation)
-    while list(new_solution.values()).count(1) != list(new_solution.values()).count(0):
-        new_solution = mutate(solution, perturbation)
+    new_solution = {i + 1: i for i in GLS.check_equality(500,
+                                          list(range(500)), list(new_solution.values()))}
     return new_solution
+
 
 def transform_results(results_dict):
     new_child = []
@@ -60,14 +62,15 @@ if __name__ == '__main__':
     nodes, connections, degrees, freedoms = read_graph_data('Graph500.txt')
     data_storage = join('data', 'gls')
     performance_stats = pd.DataFrame()
-    solutions = pd.DataFrame(columns = ['Cutstate'])
+    solutions = pd.DataFrame(columns=['Cutstate'])
 
     for j in range(25):
         tic = perf_counter()
         best_solution = {}
         # Create gls and graph object
         gls = GLS(population_size=50)
-        graph = Graph(nodes=nodes, connections=connections, freedoms=freedoms, degrees=degrees)    
+        graph = Graph(nodes=nodes, connections=connections,
+                      freedoms=freedoms, degrees=degrees)
 
         # Improve population by running the FM on each individual once
         ranked_population = {}
@@ -90,23 +93,27 @@ if __name__ == '__main__':
             # Create child
             child = gls.crossover()
 
-            #Mutate child
+            # Mutate child
             child = mutation(gls.transform_person(child))
-            
+
             # Compute FM
             graph.init_partition(child)
             graph.setup_gains()
             result = graph.fiduccia_mattheyses()
             child_cutstate, new_child = transform_results(result)
             # Create new population
-            ranked_population = gls.create_new_population(500, new_child, child_cutstate, ranked_population)
-        solutions = solutions.append({'Cutstate': sorted(ranked_population.keys())}, ignore_index=True)
+            ranked_population = gls.create_new_population(
+                500, new_child, child_cutstate, ranked_population)
+        solutions = solutions.append(
+            {'Cutstate': sorted(ranked_population.keys())}, ignore_index=True)
         toc = perf_counter()
-        performance_stats = performance_stats.append({'Execution Time': toc - tic}, ignore_index=True)
-        
+        performance_stats = performance_stats.append(
+            {'Execution Time': toc - tic}, ignore_index=True)
+
         # Delete gls and graph
         del gls
         del graph
 
     solutions.to_csv(join(data_storage, f'gls_with_fm.csv'))
-    performance_stats.to_csv(join(data_storage, f'gls_with_fm_performance.csv'))
+    performance_stats.to_csv(
+        join(data_storage, f'gls_with_fm_performance.csv'))
