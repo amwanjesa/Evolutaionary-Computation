@@ -95,11 +95,16 @@ if __name__ == '__main__':
     average_ils_003 = np.mean(data_003)
     average_ils_005 = np.mean(data_005)
     average_gls_data = np.mean(gls_data_cutstate)
+    print(average_mls_data)
+    print(average_ils_001)
+    print(average_ils_003)
+    print(average_ils_005)
+    print(average_gls_data)
 
-    get_plot(mls_data['cutstate'], ylabel= 'Cutstate', mode = 'MLS')
-    get_plot([data_001, data_003, data_005], ylabel= 'Cutstate', mode = 'ILS')
-    get_plot(gls_data_cutstate, ylabel= 'Cutstate', mode = 'GLS')
-    get_plot([mls_data['cutstate'], data_001, data_003, data_005, gls_data_cutstate], ylabel= 'Cutstate', mode = 'ALL')
+    #get_plot(mls_data['cutstate'], ylabel= 'Cutstate', mode = 'MLS')
+    #get_plot([data_001, data_003, data_005], ylabel= 'Cutstate', mode = 'ILS')
+    #get_plot(gls_data_cutstate, ylabel= 'Cutstate', mode = 'GLS')
+    #get_plot([mls_data['cutstate'], data_001, data_003, data_005, gls_data_cutstate], ylabel= 'Cutstate', mode = 'ALL')
 
     # Wilcoxon test
     wilcoxon_mls_gls = wilcoxon(mls_data['cutstate'], gls_data_cutstate)
@@ -109,6 +114,9 @@ if __name__ == '__main__':
     wilcoxon_gls_ils001 = wilcoxon(gls_data_cutstate, data_001)
     wilcoxon_gls_ils003 = wilcoxon(gls_data_cutstate, data_003)
     wilcoxon_gls_ils005 = wilcoxon(gls_data_cutstate, data_005)
+    wilcoxon_ils001_ils003 = wilcoxon(data_001, data_003)
+    wilcoxon_ils001_ils005 = wilcoxon(data_001, data_005)
+    wilcoxon_ils003_ils005 = wilcoxon(data_003, data_005)
     print(f'MLS and GLS: {wilcoxon_mls_gls}')
     print(f'MLS and ILS001: {wilcoxon_mls_ils001}')
     print(f'MLS and ILS003: {wilcoxon_mls_ils003}')
@@ -116,6 +124,9 @@ if __name__ == '__main__':
     print(f'GLS and ILS001: {wilcoxon_gls_ils001}')
     print(f'GLS and ILS003: {wilcoxon_gls_ils003}')
     print(f'GLS and ILS005: {wilcoxon_gls_ils005}')
+    print(f'ILS001 and ILS003: {wilcoxon_ils001_ils003}')
+    print(f'ILS001 and ILS003: {wilcoxon_ils001_ils005}')
+    print(f'ILS001 and ILS003: {wilcoxon_ils003_ils005}')
  
 
     #### CPU PERFORMANCE ####
@@ -130,11 +141,16 @@ if __name__ == '__main__':
     average_ils_performance003 = np.mean(performance_003)
     average_ils_performance005 = np.mean(performance_005)
     average_gls_performance = np.mean(gls_performance_minutes)
+    print(average_mls_performance)  
+    print(average_ils_performance001)  
+    print(average_ils_performance003)  
+    print(average_ils_performance005)  
+    print(average_gls_performance)
 
-    get_plot(mls_performance_minutes, ylabel= 'Time (min)', mode = 'MLS')
-    get_plot([performance_001, performance_003, performance_005], ylabel= 'Time (min)', mode = 'ILS')
-    get_plot(gls_performance_minutes, ylabel= 'Time (min)', mode = 'GLS')
-    get_plot([mls_performance_minutes, performance_001, performance_003, performance_005, gls_performance_minutes], ylabel= 'Time (min)', mode = 'ALL')
+    #get_plot(mls_performance_minutes, ylabel= 'Time (min)', mode = 'MLS')
+    #get_plot([performance_001, performance_003, performance_005], ylabel= 'Time (min)', mode = 'ILS')
+    #get_plot(gls_performance_minutes, ylabel= 'Time (min)', mode = 'GLS')
+    #get_plot([mls_performance_minutes, performance_001, performance_003, performance_005, gls_performance_minutes], ylabel= 'Time (min)', mode = 'ALL')
 
     # Wilcoxon test
     wilcoxon_performance_mls_gls = wilcoxon(mls_performance_minutes, gls_performance_minutes)
@@ -144,6 +160,9 @@ if __name__ == '__main__':
     wilcoxon_performance_gls_ils001 = wilcoxon(gls_performance_minutes, performance_001)
     wilcoxon_performance_gls_ils003 = wilcoxon(gls_performance_minutes, performance_003)
     wilcoxon_performance_gls_ils005 = wilcoxon(gls_performance_minutes, performance_005)
+    wilcoxon_performance_ils001_ils003 = wilcoxon(performance_001, performance_003)
+    wilcoxon_performance_ils001_ils005 = wilcoxon(performance_001, performance_005)
+    wilcoxon_performance_ils003_ils005 = wilcoxon(performance_003, performance_005)
     print(f'MLS and GLS: {wilcoxon_performance_mls_gls}')
     print(f'MLS and ILS001: {wilcoxon_performance_mls_ils001}')
     print(f'MLS and ILS003: {wilcoxon_performance_mls_ils003}')
@@ -151,6 +170,9 @@ if __name__ == '__main__':
     print(f'GLS and ILS001: {wilcoxon_performance_gls_ils001}')
     print(f'GLS and ILS003: {wilcoxon_performance_gls_ils003}')
     print(f'GLS and ILS005: {wilcoxon_performance_gls_ils005}')
+    print(f'ILS001 and ILS003: {wilcoxon_performance_ils001_ils003}')
+    print(f'ILS001 and ILS003: {wilcoxon_performance_ils001_ils005}')
+    print(f'ILS001 and ILS003: {wilcoxon_performance_ils003_ils005}')
 
 
     #### TIMEOUT ###
@@ -166,11 +188,16 @@ if __name__ == '__main__':
     average_ils_timeout_003 = np.mean(timeout_1_003)
     average_ils_timeout_005 = np.mean(timeout_1_005)
     average_gls_timeout = np.mean(gls_timeout_cutstate)
+    print(average_mls_timeout)
+    print(average_ils_timeout_001)
+    print(average_ils_timeout_003)
+    print(average_ils_timeout_005)
+    print(average_gls_timeout)
 
-    get_plot(mls_timeout_1['cutstate'], ylabel= 'Cutstate', mode = 'MLS')
-    get_plot([timeout_1_001, timeout_1_003, timeout_1_005], ylabel= 'Cutstate', mode = 'ILS')
-    get_plot(gls_timeout_cutstate, ylabel= 'Cutstate', mode = 'GLS')
-    get_plot([mls_timeout_1['cutstate'], timeout_1_001, timeout_1_003, timeout_1_005, gls_timeout_cutstate], ylabel= 'Cutstate', mode = 'ALL')
+    #get_plot(mls_timeout_1['cutstate'], ylabel= 'Cutstate', mode = 'MLS')
+    #get_plot([timeout_1_001, timeout_1_003, timeout_1_005], ylabel= 'Cutstate', mode = 'ILS')
+    #get_plot(gls_timeout_cutstate, ylabel= 'Cutstate', mode = 'GLS')
+    #get_plot([mls_timeout_1['cutstate'], timeout_1_001, timeout_1_003, timeout_1_005, gls_timeout_cutstate], ylabel= 'Cutstate', mode = 'ALL')
 
     # 20 minutes
     timeout_20_001 = list(ils_timeout_20['cutstate'][:25])
@@ -184,9 +211,14 @@ if __name__ == '__main__':
     average_ils_timeout_003_20 = np.mean(timeout_20_003)
     average_ils_timeout_005_20 = np.mean(timeout_20_005)
     average_gls_timeout_20 = np.mean(gls_timeout_cutstate_20)
+    print(average_mls_timeout_20)
+    print(average_ils_timeout_001_20)
+    print(average_ils_timeout_003_20)
+    print(average_ils_timeout_005_20)
+    print(average_gls_timeout_20)
 
-    get_plot(mls_timeout_20['cutstate'], ylabel= 'Cutstate', mode = 'MLS')
-    get_plot([timeout_20_001, timeout_20_003, timeout_20_005], ylabel= 'Cutstate', mode = 'ILS')
-    get_plot(gls_timeout_cutstate_20, ylabel= 'Cutstate', mode = 'GLS')
-    get_plot([mls_timeout_20['cutstate'], timeout_20_001, timeout_20_003, timeout_20_005, gls_timeout_cutstate_20], ylabel= 'Cutstate', mode = 'ALL')
+    #get_plot(mls_timeout_20['cutstate'], ylabel= 'Cutstate', mode = 'MLS')
+    #get_plot([timeout_20_001, timeout_20_003, timeout_20_005], ylabel= 'Cutstate', mode = 'ILS')
+    #get_plot(gls_timeout_cutstate_20, ylabel= 'Cutstate', mode = 'GLS')
+    #get_plot([mls_timeout_20['cutstate'], timeout_20_001, timeout_20_003, timeout_20_005, gls_timeout_cutstate_20], ylabel= 'Cutstate', mode = 'ALL')
 
