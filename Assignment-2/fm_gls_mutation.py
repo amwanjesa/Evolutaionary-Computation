@@ -91,10 +91,10 @@ if __name__ == '__main__':
             child = gls.crossover()
 
             #Mutate child
-            child = mutation(child)
+            child = mutation(gls.transform_person(child))
             
             # Compute FM
-            graph.init_partition(gls.transform_person(child))
+            graph.init_partition(child)
             graph.setup_gains()
             result = graph.fiduccia_mattheyses()
             child_cutstate, new_child = transform_results(result)
