@@ -42,10 +42,11 @@ def mutation(solution, perturbation=0.01):
                 new_solution[node] = block
         return new_solution
 
-    new_solution = mutate(solution, perturbation)
-    while list(new_solution.values()).count(1) != list(new_solution.values()).count(0):
-        new_solution = mutate(solution, perturbation)
-    return new_solution
+    mutated_solution = mutate(solution, perturbation)
+    mutated_solution = GLS.check_equality(500,
+                                          list(range(500)), list(mutated_solution.values()))
+    mutated_solution = {i + 1: mutated_solution[i] for i in range(len(mutated_solution))}
+    return mutated_solution
 
 def transform_results(results_dict):
     new_child = []
@@ -94,7 +95,7 @@ if __name__ == '__main__':
                     child = gls.crossover()
 
                     #Mutate child
-                    child = mutation(child)
+                    child = mutation(gls.transform_person(child))
 
                     # Compute FM
                     graph.init_partition(gls.transform_person(child))

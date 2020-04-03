@@ -43,8 +43,9 @@ def mutation(solution, perturbation=0.01):
         return new_solution
 
     new_solution = mutate(solution, perturbation)
-    new_solution = {i + 1: i for i in GLS.check_equality(500,
-                                          list(range(500)), list(new_solution.values()))}
+    new_solution = GLS.check_equality(500,
+                                          list(range(500)), list(new_solution.values()))
+    new_solution = {i + 1: new_solution[i] for i in range(len(new_solution))}
     return new_solution
 
 
@@ -113,7 +114,8 @@ if __name__ == '__main__':
         # Delete gls and graph
         del gls
         del graph
+        break
 
-    solutions.to_csv(join(data_storage, f'gls_with_fm.csv'))
+    solutions.to_csv(join(data_storage, f'gls_with_fm_mutation.csv'))
     performance_stats.to_csv(
-        join(data_storage, f'gls_with_fm_performance.csv'))
+        join(data_storage, f'gls_with_fm_mutation_performance.csv'))
