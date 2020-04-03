@@ -106,7 +106,6 @@ if __name__ == '__main__':
     average_gls_mutation_performance = np.mean(gls_mutation_performance['Execution Time'] / 60)
     print(average_gls_mutation)
     print(average_gls_mutation_performance)
-    print(gls_mutation_cutstate)
 
     ### REAL DATA ###
     real_mls = pd.read_csv('data/mls/mls_limit_1500.csv')
@@ -116,6 +115,8 @@ if __name__ == '__main__':
     average_real_ils = np.mean(real_ils['cutstate'])
     print(average_real_ils)
     get_plot([real_mls['cutstate'], real_ils['cutstate']], ylabel = 'Cutstate', mode='Real')
+    wilcoxon_real_mls_ils = wilcoxon(real_mls['cutstate'], real_ils['cutstate'])
+    print(wilcoxon_real_mls_ils)
 
 
     #### CUTSTATE ####
@@ -154,6 +155,12 @@ if __name__ == '__main__':
     wilcoxon_ils001_ils003 = wilcoxon(data_001, data_003)
     wilcoxon_ils001_ils005 = wilcoxon(data_001, data_005)
     wilcoxon_ils003_ils005 = wilcoxon(data_003, data_005)
+
+    wilcoxon_ils001_ilsxgls = wilcoxon(data_001, gls_mutation_cutstate)
+    wilcoxon_gls_ilsxgls = wilcoxon(gls_data_cutstate, gls_mutation_cutstate)
+    print(wilcoxon_ils001_ilsxgls)
+    print(wilcoxon_gls_ilsxgls)
+
     """
     print(f'MLS and GLS: {wilcoxon_mls_gls}')
     print(f'MLS and ILS001: {wilcoxon_mls_ils001}')
