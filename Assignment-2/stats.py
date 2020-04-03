@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.stats import wilcoxon
+from scipy.stats import mannwhitneyu
 
 def get_plot(data, ylabel, mode = 'MLS'): 
     if mode == 'ILS':
@@ -104,19 +104,19 @@ if __name__ == '__main__':
     gls_mutation_cutstate = get_gls_data(gls_mutation['Cutstate'])
     average_gls_mutation = np.mean(gls_mutation_cutstate)
     average_gls_mutation_performance = np.mean(gls_mutation_performance['Execution Time'] / 60)
-    print(average_gls_mutation)
-    print(average_gls_mutation_performance)
+    #print(average_gls_mutation)
+    #print(average_gls_mutation_performance)
 
     ### REAL DATA ###
     real_mls = pd.read_csv('data/mls/mls_limit_1500.csv')
     average_real_mls = np.mean(real_mls['cutstate'])
-    print(average_real_mls)
+    #print(average_real_mls)
     real_ils = pd.read_csv('data/ils/ils_0.01_limit_1500.csv')
     average_real_ils = np.mean(real_ils['cutstate'])
-    print(average_real_ils)
+    #print(average_real_ils)
     get_plot([real_mls['cutstate'], real_ils['cutstate']], ylabel = 'Cutstate', mode='Real')
-    wilcoxon_real_mls_ils = wilcoxon(real_mls['cutstate'], real_ils['cutstate'])
-    print(wilcoxon_real_mls_ils)
+    mannwhitneyu_real_mls_ils = mannwhitneyu(real_mls['cutstate'], real_ils['cutstate'])
+    print(mannwhitneyu_real_mls_ils)
 
 
     #### CUTSTATE ####
@@ -145,34 +145,31 @@ if __name__ == '__main__':
     get_plot([mls_data['cutstate'], data_001, data_003, data_005, gls_data_cutstate], ylabel= 'Cutstate', mode = 'ALL')
     """
     # Wilcoxon test
-    wilcoxon_mls_gls = wilcoxon(mls_data['cutstate'], gls_data_cutstate)
-    wilcoxon_mls_ils001 = wilcoxon(mls_data['cutstate'], data_001)
-    wilcoxon_mls_ils003 = wilcoxon(mls_data['cutstate'], data_003)
-    wilcoxon_mls_ils005 = wilcoxon(mls_data['cutstate'], data_005)
-    wilcoxon_gls_ils001 = wilcoxon(gls_data_cutstate, data_001)
-    wilcoxon_gls_ils003 = wilcoxon(gls_data_cutstate, data_003)
-    wilcoxon_gls_ils005 = wilcoxon(gls_data_cutstate, data_005)
-    wilcoxon_ils001_ils003 = wilcoxon(data_001, data_003)
-    wilcoxon_ils001_ils005 = wilcoxon(data_001, data_005)
-    wilcoxon_ils003_ils005 = wilcoxon(data_003, data_005)
+    mannwhitneyu_mls_gls = mannwhitneyu(mls_data['cutstate'], gls_data_cutstate)
+    mannwhitneyu_mls_ils001 = mannwhitneyu(mls_data['cutstate'], data_001)
+    mannwhitneyu_mls_ils003 = mannwhitneyu(mls_data['cutstate'], data_003)
+    mannwhitneyu_mls_ils005 = mannwhitneyu(mls_data['cutstate'], data_005)
+    mannwhitneyu_gls_ils001 = mannwhitneyu(gls_data_cutstate, data_001)
+    mannwhitneyu_gls_ils003 = mannwhitneyu(gls_data_cutstate, data_003)
+    mannwhitneyu_gls_ils005 = mannwhitneyu(gls_data_cutstate, data_005)
+    mannwhitneyu_ils001_ils003 = mannwhitneyu(data_001, data_003)
+    mannwhitneyu_ils001_ils005 = mannwhitneyu(data_001, data_005)
+    mannwhitneyu_ils003_ils005 = mannwhitneyu(data_003, data_005)
+    mannwhitneyu_ils001_ilsxgls = mannwhitneyu(data_001, gls_mutation_cutstate)
+    mannwhitneyu_gls_ilsxgls = mannwhitneyu(gls_data_cutstate, gls_mutation_cutstate)
 
-    wilcoxon_ils001_ilsxgls = wilcoxon(data_001, gls_mutation_cutstate)
-    wilcoxon_gls_ilsxgls = wilcoxon(gls_data_cutstate, gls_mutation_cutstate)
-    print(wilcoxon_ils001_ilsxgls)
-    print(wilcoxon_gls_ilsxgls)
-
-    """
-    print(f'MLS and GLS: {wilcoxon_mls_gls}')
-    print(f'MLS and ILS001: {wilcoxon_mls_ils001}')
-    print(f'MLS and ILS003: {wilcoxon_mls_ils003}')
-    print(f'MLS and ILS005: {wilcoxon_mls_ils005}')
-    print(f'GLS and ILS001: {wilcoxon_gls_ils001}')
-    print(f'GLS and ILS003: {wilcoxon_gls_ils003}')
-    print(f'GLS and ILS005: {wilcoxon_gls_ils005}')
-    print(f'ILS001 and ILS003: {wilcoxon_ils001_ils003}')
-    print(f'ILS001 and ILS003: {wilcoxon_ils001_ils005}')
-    print(f'ILS001 and ILS003: {wilcoxon_ils003_ils005}')
-    """
+    print(f'MLS and GLS: {mannwhitneyu_mls_gls}')
+    print(f'MLS and ILS001: {mannwhitneyu_mls_ils001}')
+    print(f'MLS and ILS003: {mannwhitneyu_mls_ils003}')
+    print(f'MLS and ILS005: {mannwhitneyu_mls_ils005}')
+    print(f'GLS and ILS001: {mannwhitneyu_gls_ils001}')
+    print(f'GLS and ILS003: {mannwhitneyu_gls_ils003}')
+    print(f'GLS and ILS005: {mannwhitneyu_gls_ils005}')
+    print(f'ILS001 and ILS003: {mannwhitneyu_ils001_ils003}')
+    print(f'ILS001 and ILS003: {mannwhitneyu_ils001_ils005}')
+    print(f'ILS001 and ILS003: {mannwhitneyu_ils003_ils005}')
+    print(mannwhitneyu_ils001_ilsxgls)
+    print(mannwhitneyu_gls_ilsxgls)
 
     #### CPU PERFORMANCE ####
     mls_performance_minutes = mls_performance['Execution Time'] / 60
@@ -200,28 +197,28 @@ if __name__ == '__main__':
     """
 
     # Wilcoxon test
-    wilcoxon_performance_mls_gls = wilcoxon(mls_performance_minutes, gls_performance_minutes)
-    wilcoxon_performance_mls_ils001 = wilcoxon(mls_performance_minutes, performance_001)
-    wilcoxon_performance_mls_ils003 = wilcoxon(mls_performance_minutes, performance_003)
-    wilcoxon_performance_mls_ils005 = wilcoxon(mls_performance_minutes, performance_005)
-    wilcoxon_performance_gls_ils001 = wilcoxon(gls_performance_minutes, performance_001)
-    wilcoxon_performance_gls_ils003 = wilcoxon(gls_performance_minutes, performance_003)
-    wilcoxon_performance_gls_ils005 = wilcoxon(gls_performance_minutes, performance_005)
-    wilcoxon_performance_ils001_ils003 = wilcoxon(performance_001, performance_003)
-    wilcoxon_performance_ils001_ils005 = wilcoxon(performance_001, performance_005)
-    wilcoxon_performance_ils003_ils005 = wilcoxon(performance_003, performance_005)
-    """
-    print(f'MLS and GLS: {wilcoxon_performance_mls_gls}')
-    print(f'MLS and ILS001: {wilcoxon_performance_mls_ils001}')
-    print(f'MLS and ILS003: {wilcoxon_performance_mls_ils003}')
-    print(f'MLS and ILS005: {wilcoxon_performance_mls_ils005}')
-    print(f'GLS and ILS001: {wilcoxon_performance_gls_ils001}')
-    print(f'GLS and ILS003: {wilcoxon_performance_gls_ils003}')
-    print(f'GLS and ILS005: {wilcoxon_performance_gls_ils005}')
-    print(f'ILS001 and ILS003: {wilcoxon_performance_ils001_ils003}')
-    print(f'ILS001 and ILS003: {wilcoxon_performance_ils001_ils005}')
-    print(f'ILS001 and ILS003: {wilcoxon_performance_ils003_ils005}')
-    """
+    mannwhitneyu_performance_mls_gls = mannwhitneyu(mls_performance_minutes, gls_performance_minutes)
+    mannwhitneyu_performance_mls_ils001 = mannwhitneyu(mls_performance_minutes, performance_001)
+    mannwhitneyu_performance_mls_ils003 = mannwhitneyu(mls_performance_minutes, performance_003)
+    mannwhitneyu_performance_mls_ils005 = mannwhitneyu(mls_performance_minutes, performance_005)
+    mannwhitneyu_performance_gls_ils001 = mannwhitneyu(gls_performance_minutes, performance_001)
+    mannwhitneyu_performance_gls_ils003 = mannwhitneyu(gls_performance_minutes, performance_003)
+    mannwhitneyu_performance_gls_ils005 = mannwhitneyu(gls_performance_minutes, performance_005)
+    mannwhitneyu_performance_ils001_ils003 = mannwhitneyu(performance_001, performance_003)
+    mannwhitneyu_performance_ils001_ils005 = mannwhitneyu(performance_001, performance_005)
+    mannwhitneyu_performance_ils003_ils005 = mannwhitneyu(performance_003, performance_005)
+    
+    print(f'MLS and GLS: {mannwhitneyu_performance_mls_gls}')
+    print(f'MLS and ILS001: {mannwhitneyu_performance_mls_ils001}')
+    print(f'MLS and ILS003: {mannwhitneyu_performance_mls_ils003}')
+    print(f'MLS and ILS005: {mannwhitneyu_performance_mls_ils005}')
+    print(f'GLS and ILS001: {mannwhitneyu_performance_gls_ils001}')
+    print(f'GLS and ILS003: {mannwhitneyu_performance_gls_ils003}')
+    print(f'GLS and ILS005: {mannwhitneyu_performance_gls_ils005}')
+    print(f'ILS001 and ILS003: {mannwhitneyu_performance_ils001_ils003}')
+    print(f'ILS001 and ILS003: {mannwhitneyu_performance_ils001_ils005}')
+    print(f'ILS001 and ILS003: {mannwhitneyu_performance_ils003_ils005}')
+    
 
     #### TIMEOUT ###
     # 1 minute
