@@ -41,8 +41,9 @@ def mutation(solution, perturbation=0.01):
         return new_solution
 
     new_solution = mutate(solution, perturbation)
-    while list(new_solution.values()).count(1) != list(new_solution.values()).count(0):
-        new_solution = mutate(solution, perturbation)
+    new_solution = GLS.check_equality(500,
+                                          list(range(500)), list(new_solution.values()))
+    new_solution = {i + 1: new_solution[i] for i in range(len(new_solution))}
     return new_solution
 
 
